@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Download } from "lucide-react";
 
 import { AdminHeader } from "#/components/admin/AdminHeader";
 import { GuestDataView } from "#/components/admin/GuestDataView";
@@ -10,6 +11,8 @@ import {
 	useAdminStatsQuery,
 } from "#/hooks/use-admin-guests";
 import { checkAdminSession } from "#/lib/admin-session-fn";
+import { useAdminTheme } from "#/lib/admin-theme";
+import { useLocaleRerender } from "#/lib/locale";
 import { m } from "#/paraglide/messages";
 
 export const Route = createFileRoute("/admin/")({
@@ -25,12 +28,14 @@ export const Route = createFileRoute("/admin/")({
 
 function AdminDashboard() {
 	const { adminEmail } = Route.useRouteContext();
+	useAdminTheme();
+	const [localeKey, rerenderForLocale] = useLocaleRerender();
 	const guestsQuery = useAdminGuestsQuery(true);
 	const statsQuery = useAdminStatsQuery(true);
 
 	return (
-		<div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
-			<AdminHeader email={adminEmail} />
+		<div key={localeKey} className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
+			<AdminHeader email={adminEmail} onLocaleChange={rerenderForLocale} />
 
 			<StatsGrid stats={statsQuery.data} />
 
@@ -38,9 +43,9 @@ function AdminDashboard() {
 				<GuestFormDialog trigger={<Button>{m.admin_add_guest()}</Button>} />
 				<a
 					href="/api/admin/export"
-					className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+					className="flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
 				>
-					{m.admin_export_csv()}
+					<Download className="size-4" /> {m.admin_export_csv()}
 				</a>
 			</div>
 

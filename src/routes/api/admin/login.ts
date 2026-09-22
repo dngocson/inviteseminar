@@ -29,6 +29,10 @@ export const Route = createFileRoute("/api/admin/login")({
 				);
 
 				if (error || !data.user) {
+					// Logged server-side only (never sent to the client) so local
+					// debugging can distinguish "wrong password" from "email not
+					// confirmed", "invalid API key", etc.
+					console.error("[admin/login] signInWithPassword failed:", error);
 					throw new ApiError(
 						"UNAUTHENTICATED",
 						"Email hoặc mật khẩu không đúng",

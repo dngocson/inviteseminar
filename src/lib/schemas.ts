@@ -28,12 +28,17 @@ export const maxAttendeesSchema = z.number().int().min(1).max(5);
 export const guestCreateSchema = z.object({
 	fullName: z.string().trim().min(1).max(200),
 	maxAttendees: maxAttendeesSchema.default(5),
+	// The invitation card's display language. Purely a default for the link
+	// the admin generates (`&l=vi|en`) — the guest can still switch language
+	// on the card itself; this just picks which one they land on.
+	locale: localeSchema.default("vi"),
 });
 export type GuestCreateInput = z.infer<typeof guestCreateSchema>;
 
 export const guestUpdateSchema = z.object({
 	fullName: z.string().trim().min(1).max(200).optional(),
 	maxAttendees: maxAttendeesSchema.optional(),
+	locale: localeSchema.optional(),
 });
 export type GuestUpdateInput = z.infer<typeof guestUpdateSchema>;
 
@@ -42,6 +47,7 @@ export const guestDto = z.object({
 	inviteCode: inviteCodeSchema,
 	fullName: z.string(),
 	maxAttendees: maxAttendeesSchema,
+	locale: localeSchema,
 	createdAt: z.iso.datetime(),
 	updatedAt: z.iso.datetime(),
 });

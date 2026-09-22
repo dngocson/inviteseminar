@@ -1,9 +1,26 @@
+import {
+	Copy,
+	MoreHorizontal,
+	Pencil,
+	QrCode,
+	RefreshCw,
+	Search,
+	Trash2,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "#/components/admin/ConfirmDialog";
 import { GuestFormDialog } from "#/components/admin/GuestFormDialog";
+import { QrCodeDialog } from "#/components/admin/QrCodeDialog";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "#/components/ui/dropdown-menu";
 import { Input } from "#/components/ui/input";
 import {
 	Select,
@@ -58,36 +75,56 @@ function RowActions({ guest }: { guest: GuestWithRsvpDto }) {
 	const regenerateMutation = useRegenerateInviteCodeMutation();
 
 	return (
-		<div className="flex flex-wrap gap-2">
+		<div className="flex items-center justify-end gap-1">
 			<Button
-				size="sm"
-				variant="outline"
+				size="icon-sm"
+				variant="ghost"
+				title={m.admin_copy_link()}
 				onClick={() => copyLink(guest.inviteUrl)}
 			>
-				{m.admin_copy_link()}
+				<Copy />
 			</Button>
-			<GuestFormDialog
-				guest={guest}
+			<QrCodeDialog
+				guestName={guest.fullName}
+				inviteUrl={guest.inviteUrl}
 				trigger={
-					<Button size="sm" variant="outline">
-						{m.admin_edit_guest()}
+					<Button size="icon-sm" variant="ghost" title={m.admin_show_qr()}>
+						<QrCode />
 					</Button>
 				}
 			/>
-			<Button
-				size="sm"
-				variant="outline"
-				onClick={() => setConfirmRegenerate(true)}
-			>
-				{m.admin_regenerate_code()}
-			</Button>
-			<Button
-				size="sm"
-				variant="destructive"
-				onClick={() => setConfirmDelete(true)}
-			>
-				{m.admin_delete_guest()}
-			</Button>
+
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button
+						size="icon-sm"
+						variant="ghost"
+						title={m.admin_table_actions()}
+					>
+						<MoreHorizontal />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end">
+					<GuestFormDialog
+						guest={guest}
+						trigger={
+							<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+								<Pencil /> {m.admin_edit_guest()}
+							</DropdownMenuItem>
+						}
+					/>
+					<DropdownMenuItem onSelect={() => setConfirmRegenerate(true)}>
+						<RefreshCw /> {m.admin_regenerate_code()}
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem
+						variant="destructive"
+						onSelect={() => setConfirmDelete(true)}
+					>
+						<Trash2 /> {m.admin_delete_guest()}
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
 
 			<ConfirmDialog
 				open={confirmRegenerate}
@@ -138,12 +175,15 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 	return (
 		<div className="space-y-4">
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-				<Input
-					placeholder={m.admin_search_placeholder()}
-					value={search}
-					onChange={(e) => setSearch(e.target.value)}
-					className="sm:max-w-xs"
-				/>
+				<div className="relative sm:max-w-xs">
+					<Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						placeholder={m.admin_search_placeholder()}
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						className="pl-9"
+					/>
+				</div>
 				<Select
 					value={statusFilter}
 					onValueChange={(value) => setStatusFilter(value as StatusFilter)}
@@ -165,23 +205,25 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 			</div>
 
 			{filtered.length === 0 ? (
-				<p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+				<p className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
 					{m.admin_empty_state()}
 				</p>
 			) : (
 				<>
 					{/* Desktop table */}
-					<div className="hidden overflow-hidden rounded-xl border md:block">
+					<div className="hidden overflow-hidden rounded-2xl border bg-card md:block">
 						<Table>
 							<TableHeader>
-								<TableRow>
+								<TableRow className="hover:bg-transparent">
 									<TableHead>{m.admin_table_name()}</TableHead>
 									<TableHead>{m.admin_table_code()}</TableHead>
 									<TableHead>{m.admin_table_status()}</TableHead>
 									<TableHead>{m.admin_table_count()}</TableHead>
 									<TableHead>{m.admin_table_message()}</TableHead>
 									<TableHead>{m.admin_table_updated()}</TableHead>
-									<TableHead>{m.admin_table_actions()}</TableHead>
+									<TableHead className="text-right">
+										{m.admin_table_actions()}
+									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -190,14 +232,19 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 										<TableCell className="font-medium">
 											{guest.fullName}
 										</TableCell>
-										<TableCell className="font-mono text-xs">
+										<TableCell className="font-mono text-xs text-muted-foreground">
 											{guest.inviteCode}
+											<span className="ml-1 font-sans uppercase">
+												({guest.locale})
+											</span>
 										</TableCell>
 										<TableCell>
 											<StatusBadge status={guestStatus(guest)} />
 										</TableCell>
-										<TableCell>{guest.rsvp?.attendeeCount ?? "—"}</TableCell>
-										<TableCell className="max-w-48 truncate">
+										<TableCell className="tabular-nums">
+											{guest.rsvp?.attendeeCount ?? "—"}
+										</TableCell>
+										<TableCell className="max-w-48 truncate text-muted-foreground">
 											{guest.rsvp?.message || "—"}
 										</TableCell>
 										<TableCell className="text-xs text-muted-foreground">
@@ -217,12 +264,12 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 					{/* Mobile list */}
 					<div className="space-y-3 md:hidden">
 						{filtered.map((guest) => (
-							<div key={guest.id} className="rounded-xl border bg-card p-4">
+							<div key={guest.id} className="rounded-2xl border bg-card p-4">
 								<div className="flex items-start justify-between gap-2">
 									<div>
 										<p className="font-medium">{guest.fullName}</p>
 										<p className="font-mono text-xs text-muted-foreground">
-											{guest.inviteCode}
+											{guest.inviteCode} ({guest.locale.toUpperCase()})
 										</p>
 									</div>
 									<StatusBadge status={guestStatus(guest)} />
@@ -235,7 +282,7 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 								<p className="mt-1 text-xs text-muted-foreground">
 									{m.admin_table_count()}: {guest.rsvp?.attendeeCount ?? "—"}
 								</p>
-								<div className="mt-3">
+								<div className="mt-3 flex justify-end border-t pt-3">
 									<RowActions guest={guest} />
 								</div>
 							</div>

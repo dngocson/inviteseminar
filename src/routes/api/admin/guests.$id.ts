@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { mapGuestRow } from "#/lib/admin-guest-mapper";
+import { GUEST_WITH_RSVP_SELECT, mapGuestRow } from "#/lib/admin-guest-mapper";
 import {
 	ApiError,
 	apiJsonResponse,
@@ -9,9 +9,6 @@ import {
 import { requireAdminUser } from "#/lib/auth";
 import { guestUpdateSchema } from "#/lib/schemas";
 import { getSupabaseAdminClient } from "#/lib/supabase/admin";
-
-const GUEST_WITH_RSVP_SELECT =
-	"id, invite_code, full_name, max_attendees, created_at, updated_at, rsvp:rsvps(responder_name, message, attending, attendee_count, updated_at)";
 
 function idFromUrl(request: Request, suffix = ""): string {
 	const segments = new URL(request.url).pathname.split("/");
@@ -48,6 +45,9 @@ export const Route = createFileRoute("/api/admin/guests/$id")({
 						}),
 						...(parsed.data.maxAttendees !== undefined && {
 							max_attendees: parsed.data.maxAttendees,
+						}),
+						...(parsed.data.locale !== undefined && {
+							locale: parsed.data.locale,
 						}),
 					})
 					.eq("id", id)

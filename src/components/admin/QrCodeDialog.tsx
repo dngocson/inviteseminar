@@ -1,0 +1,93 @@
+import { QRCodeCanvas } from "qrcode.react";
+import type { ReactNode } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "#/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "#/components/ui/dialog";
+import { m } from "#/paraglide/messages";
+
+interface QrCodeDialogProps {
+	trigger: ReactNode;
+	guestName: string;
+	inviteUrl: string;
+}
+
+export function QrCodeDialog({
+	trigger,
+	guestName,
+	inviteUrl,
+}: QrCodeDialogProps) {
+	const [open, setOpen] = useState(false);
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+
+	function downloadPng() {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const link = document.createElement("a");
+		link.download = `qr-${guestName.trim().replace(/\s+/g, "-").toLowerCase()}.png`;
+		link.href = canvas.toDataURL("image/png");
+		link.click();
+	}
+
+	async function copyLink() {
+		try {
+			await navigator.clipboard.writeText(inviteUrl);
+			toast.success(m.admin_copy_link_success());
+		} catch {
+			toast.error(m.admin_error_generic());
+		}
+	}
+
+	return (
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>{trigger}</DialogTrigger>
+			<DialogContent className="sm:max-w-xs">
+				<DialogHeader>
+					<DialogTitle>
+						{m.admin_qr_dialog_title({ name: guestName })}
+					</DialogTitle>
+				</DialogHeader>
+
+				<div className="flex flex-col items-center gap-4 py-2">
+					<div className="rounded-2xl border bg-white p-4">
+						<QRCodeCanvas
+							ref={canvasRef}
+							value={inviteUrl}
+							size={200}
+							marginSize={0}
+							level="M"
+						/>
+					</div>
+					<button
+						type="button"
+						onClick={copyLink}
+						className="max-w-full truncate text-xs text-muted-foreground underline-offset-4 hover:underline"
+						title={inviteUrl}
+					>
+						{inviteUrl}
+					</button>
+				</div>
+
+				<DialogFooter>
+					<Button
+						type="button"
+						variant="outline"
+						onClick={() => setOpen(false)}
+					>
+						{m.admin_cancel()}
+					</Button>
+					<Button type="button" onClick={downloadPng}>
+						{m.admin_qr_download()}
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}

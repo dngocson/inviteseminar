@@ -1,13 +1,16 @@
+import type { ReactNode } from "react";
 import { m } from "#/paraglide/messages";
 
 interface InvitationStatusScreenProps {
 	title: string;
 	body: string;
+	action?: ReactNode;
 }
 
 export function InvitationStatusScreen({
 	title,
 	body,
+	action,
 }: InvitationStatusScreenProps) {
 	return (
 		<div className="lab-theme flex min-h-dvh items-center justify-center px-6 py-16">
@@ -19,6 +22,7 @@ export function InvitationStatusScreen({
 				<p className="mt-3 text-sm leading-relaxed text-(--carbon-soft)">
 					{body}
 				</p>
+				{action}
 			</div>
 		</div>
 	);

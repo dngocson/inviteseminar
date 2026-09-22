@@ -10,10 +10,14 @@ import {
 	FieldLabel,
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
+import { eventConfig, localized } from "#/content/event";
 import { useLoginMutation } from "#/hooks/use-admin-auth";
 import { checkAdminSession } from "#/lib/admin-session-fn";
+import { useAdminTheme } from "#/lib/admin-theme";
 import { ApiRequestError } from "#/lib/api-client";
+import { useLocaleRerender } from "#/lib/locale";
 import { m } from "#/paraglide/messages";
+import { getLocale } from "#/paraglide/runtime";
 
 export const Route = createFileRoute("/admin/login")({
 	beforeLoad: async () => {
@@ -26,6 +30,8 @@ export const Route = createFileRoute("/admin/login")({
 });
 
 function AdminLoginPage() {
+	useAdminTheme();
+	useLocaleRerender();
 	const navigate = useNavigate();
 	const mutation = useLoginMutation();
 	const [formError, setFormError] = useState<string | null>(null);
@@ -48,9 +54,17 @@ function AdminLoginPage() {
 	});
 
 	return (
-		<div className="flex min-h-dvh items-center justify-center bg-muted/30 px-4">
-			<div className="w-full max-w-sm rounded-2xl border bg-card p-8 shadow-sm">
-				<h1 className="text-xl font-semibold">{m.admin_login_title()}</h1>
+		<div className="flex min-h-dvh items-center justify-center px-4">
+			<div className="w-full max-w-sm rounded-2xl border bg-card p-8">
+				<p className="text-xs font-semibold tracking-wide text-primary">
+					{localized(eventConfig.seminarName, getLocale())}
+				</p>
+				<h1
+					className="mt-1 text-2xl font-semibold"
+					style={{ fontFamily: "'Fraunces', Georgia, serif" }}
+				>
+					{m.admin_login_title()}
+				</h1>
 				<p className="mt-1 text-sm text-muted-foreground">
 					{m.admin_login_subtitle()}
 				</p>

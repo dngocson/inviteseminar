@@ -218,9 +218,11 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 												{Array.from(
 													{ length: invitation.maxAttendees },
 													(_, i) => i + 1,
-												).map((count) => (
-													<SelectItem key={count} value={String(count)}>
-														{m.rsvp_count_option({ count })}
+												).map((total) => (
+													<SelectItem key={total} value={String(total)}>
+														{total === 1
+															? m.rsvp_count_option_self()
+															: m.rsvp_count_option({ count: total - 1 })}
 													</SelectItem>
 												))}
 											</SelectContent>

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { mapGuestRow } from "#/lib/admin-guest-mapper";
+import { GUEST_WITH_RSVP_SELECT, mapGuestRow } from "#/lib/admin-guest-mapper";
 import {
 	ApiError,
 	apiJsonResponse,
@@ -9,9 +9,6 @@ import {
 import { requireAdminUser } from "#/lib/auth";
 import { withInviteCodeRetry } from "#/lib/invite-code";
 import { getSupabaseAdminClient } from "#/lib/supabase/admin";
-
-const GUEST_WITH_RSVP_SELECT =
-	"id, invite_code, full_name, max_attendees, created_at, updated_at, rsvp:rsvps(responder_name, message, attending, attendee_count, updated_at)";
 
 export const Route = createFileRoute("/api/admin/guests/$id/regenerate")({
 	server: {

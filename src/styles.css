@@ -215,6 +215,40 @@ code {
   }
 }
 
+/* ---------------------------------------------------------------------- */
+/* Admin dashboard — same brand (mineral teal / carbon / champagne) as the */
+/* invitation card, re-skinned onto shadcn's own CSS variables so every    */
+/* shadcn primitive (Button, Badge, Input focus ring…) picks it up without */
+/* per-component overrides. A work surface, not a showcase: flat borders,  */
+/* no card-stack shadows, colour used only where it carries meaning.       */
+/* ---------------------------------------------------------------------- */
+.admin-theme {
+  --background: #fbfaf7;
+  --foreground: #14181a;
+  --card: #ffffff;
+  --card-foreground: #14181a;
+  --popover: #ffffff;
+  --popover-foreground: #14181a;
+  --primary: #2d7a75;
+  --primary-foreground: #ffffff;
+  --secondary: #f0eee6;
+  --secondary-foreground: #14181a;
+  --muted: #f0eee6;
+  --muted-foreground: #6b7274;
+  --accent: #e6f1f0;
+  --accent-foreground: #1f6b66;
+  --destructive: #c8492f;
+  --destructive-foreground: #ffffff;
+  --border: #e6e2d6;
+  --input: #e6e2d6;
+  --ring: rgb(45 122 117 / 45%);
+  --radius: 0.85rem;
+
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100dvh;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

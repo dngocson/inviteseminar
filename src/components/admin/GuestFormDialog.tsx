@@ -17,6 +17,7 @@ import {
 	FieldLabel,
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
 import {
 	Select,
 	SelectContent,
@@ -29,7 +30,7 @@ import {
 	useUpdateGuestMutation,
 } from "#/hooks/use-admin-guests";
 import { ApiRequestError } from "#/lib/api-client";
-import type { GuestWithRsvpDto } from "#/lib/schemas";
+import type { GuestWithRsvpDto, Locale } from "#/lib/schemas";
 import { m } from "#/paraglide/messages";
 
 interface GuestFormDialogProps {
@@ -47,6 +48,7 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 		defaultValues: {
 			fullName: guest?.fullName ?? "",
 			maxAttendees: guest?.maxAttendees ?? 5,
+			locale: guest?.locale ?? ("vi" as Locale),
 		},
 		onSubmit: async ({ value }) => {
 			if (guest) {
@@ -134,6 +136,42 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 											))}
 										</SelectContent>
 									</Select>
+								</FieldContent>
+							</Field>
+						)}
+					</form.Field>
+
+					<form.Field name="locale">
+						{(field) => (
+							<Field>
+								<FieldContent>
+									<FieldLabel>{m.admin_guest_locale_label()}</FieldLabel>
+									<RadioGroup
+										value={field.state.value}
+										onValueChange={(value) =>
+											field.handleChange(value as Locale)
+										}
+										className="flex gap-4"
+									>
+										<div className="flex items-center gap-2">
+											<RadioGroupItem value="vi" id="guest-locale-vi" />
+											<label
+												htmlFor="guest-locale-vi"
+												className="text-sm font-medium"
+											>
+												{m.admin_guest_locale_vi()}
+											</label>
+										</div>
+										<div className="flex items-center gap-2">
+											<RadioGroupItem value="en" id="guest-locale-en" />
+											<label
+												htmlFor="guest-locale-en"
+												className="text-sm font-medium"
+											>
+												{m.admin_guest_locale_en()}
+											</label>
+										</div>
+									</RadioGroup>
 								</FieldContent>
 							</Field>
 						)}

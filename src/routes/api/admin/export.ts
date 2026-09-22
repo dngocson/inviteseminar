@@ -5,8 +5,8 @@ import { ApiError, withApiErrorHandling } from "#/lib/api-response";
 import { requireAdminUser } from "#/lib/auth";
 import { getSupabaseAdminClient } from "#/lib/supabase/admin";
 
-const GUEST_WITH_RSVP_SELECT =
-	"invite_code, full_name, max_attendees, rsvp:rsvps(responder_name, message, attending, attendee_count, updated_at)";
+const GUEST_EXPORT_SELECT =
+	"invite_code, full_name, max_attendees, locale, rsvp:rsvps(responder_name, message, attending, attendee_count, updated_at)";
 
 export const Route = createFileRoute("/api/admin/export")({
 	server: {
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/api/admin/export")({
 				const admin = getSupabaseAdminClient();
 				const { data, error } = await admin
 					.from("guests")
-					.select(GUEST_WITH_RSVP_SELECT)
+					.select(GUEST_EXPORT_SELECT)
 					.order("created_at", { ascending: true });
 
 				if (error)
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/api/admin/export")({
 						"Mã mời": row.invite_code,
 						"Họ tên": row.full_name,
 						"Số người tối đa": row.max_attendees,
+						"Ngôn ngữ": row.locale,
 						"Trạng thái": rsvp
 							? rsvp.attending
 								? "Tham dự"
