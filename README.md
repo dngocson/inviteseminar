@@ -1,230 +1,94 @@
-Welcome to your new TanStack Start app!
+# Thiệp mời Seminar (Cosmetic Ingredients Seminar Invitation)
 
-# Getting Started
+Thiệp mời seminar song ngữ Việt/Anh (TanStack Start), mobile-first (≤425px), với điểm nhấn phân tử 3D (Three.js/React Three Fiber) và RSVP lưu trên Supabase. Bao gồm trang quản trị khách mời tại `/admin`.
 
-To run this application:
+## 1. Cài đặt cục bộ
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-# Building For Production
+App chạy tại `http://localhost:3000`. Không có Supabase env, các API sẽ lỗi 500 — làm theo phần 2 trước khi test RSVP/admin.
 
-To build this application for production:
+## 2. Tạo project Supabase
 
-```bash
-pnpm build
-```
+1. Tạo project mới tại [supabase.com](https://supabase.com/dashboard).
+2. Vào **SQL Editor**, chạy nội dung file [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql). Migration này tạo 3 bảng (`admin_users`, `guests`, `rsvps`), bật RLS (không có policy công khai — mọi truy cập đi qua server bằng service-role key) và các index/trigger cần thiết.
+3. Lấy 3 giá trị trong **Project Settings → API**:
+   - `Project URL` → `VITE_SUPABASE_URL`
+   - `anon public` key → `VITE_SUPABASE_ANON_KEY`
+   - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (**bí mật, không public, không đưa vào client bundle**)
 
-## Styling
+## 3. Tạo tài khoản admin đầu tiên
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+1. Vào **Authentication → Users → Add user**, tạo user bằng email/password.
+2. Copy `User UID` của user vừa tạo.
+3. Chạy trong SQL Editor:
+   ```sql
+   insert into public.admin_users (user_id) values ('<user-uid-vừa-copy>');
+   ```
+4. Đăng nhập tại `/admin/login` bằng email/password đó.
 
-### Removing Tailwind CSS
+Muốn thêm admin khác: lặp lại 3 bước trên với user mới.
 
-If you prefer not to use Tailwind CSS:
+## 4. Cấu hình biến môi trường
 
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
-
-## Linting & Formatting
-
-This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
-
-
-```bash
-pnpm lint
-pnpm format
-pnpm check
-```
-
-
-# Paraglide i18n
-
-This add-on wires up ParaglideJS for localized routing and message formatting.
-
-- Messages live in `project.inlang/messages`.
-- URLs are localized through the Paraglide Vite plugin and router `rewrite` hooks.
-- Run the dev server or build to regenerate the `src/paraglide` outputs.
-
-
-## Shadcn
-
-Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
+Copy `.env.example` thành `.env` (local) và điền:
 
 ```bash
-pnpm dlx shadcn@latest add button
+VITE_SUPABASE_URL=https://xxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
 ```
 
+`SERVER_URL` để trống — link mời do admin tạo luôn dùng origin của request hiện tại (`window.location.origin` phía client, request origin phía server), nên tự hoạt động ở localhost, Vercel preview lẫn production mà không cần cấu hình thêm.
 
-## T3Env
+### Trên Vercel
 
-- You can use T3Env to add type safety to your environment variables.
-- Add Environment variables to the `src/env.mjs` file.
-- Use the environment variables in your code.
+Vào **Project Settings → Environment Variables**, thêm 3 biến trên cho cả 3 môi trường (Production/Preview/Development). `VITE_*` là biến public (an toàn lộ ra client), `SUPABASE_SERVICE_ROLE_KEY` chỉ dùng phía server — Vercel không expose nó ra client bundle vì không có prefix `VITE_`.
 
-### Usage
+## 5. Deploy lên Vercel
 
-```ts
-import { env } from "#/env";
-
-console.log(env.VITE_APP_TITLE);
+```bash
+vercel deploy         # preview
+vercel deploy --prod  # production
 ```
 
+Hoặc kết nối repo Git với Vercel để auto-deploy mỗi push. Không cần cấu hình build command đặc biệt — Vercel tự nhận `vite build`.
 
+## 6. Smoke test sau khi deploy
 
+1. Tạo một khách mời thử trong `/admin` (đăng nhập trước), copy link được sinh ra — ví dụ dạng thật trên production:
+   ```
+   https://tuongngocyep.vercel.app/?k=Ab3x9Q2m&l=vi
+   ```
+2. Mở link ẩn danh (trình duyệt riêng tư), xác nhận: tên hiển thị đúng, đổi ngôn ngữ vẫn giữ `k`, gửi RSVP thành công, mở lại link thấy phản hồi cũ.
+3. Mở link với mã sai (`?k=xxxxxxxx`) → phải thấy màn hình "không tìm thấy lời mời", không phải form RSVP.
+4. Đăng xuất/đăng nhập lại `/admin`, refresh trang `/admin` trực tiếp (deep-link) để xác nhận session cookie qua Supabase hoạt động đúng trên domain thật.
+5. Thử xuất CSV, sao chép link, tạo lại mã mời (regenerate) — xác nhận link cũ báo "không tìm thấy" sau khi regenerate.
 
+## Định dạng URL mời
 
+Canonical: `<origin>/?k=<mã 8 ký tự Base62>&l=<vi|en>`. Thiếu `l` mặc định `vi`. Tên khách **không** nằm trong URL — chỉ có mã mời, tên đầy đủ nằm trong database và được server trả về sau khi tra mã.
 
-## Routing
+## Giới hạn đã biết (v1)
 
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
+- **Locale SSR**: server luôn render tiếng Việt (base locale) trước; client tự sửa theo `l` ngay sau khi hydrate (không reload). Độ trễ không đáng kể trên thực tế.
+- **Rate limit**: in-memory theo từng instance server (đủ cho quy mô một seminar), không đồng bộ giữa nhiều instance chạy song song.
+- Không có CMS/gửi email hàng loạt/nhiều sự kiện trong admin v1 — xem `docs/implementation-plan.md` mục **Decisions**.
 
-### Adding A Route
+## Development
 
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
+```bash
+pnpm dev             # dev server (port 3000)
+pnpm build           # production build
+pnpm generate-routes # regenerate src/routeTree.gen.ts sau khi thêm/sửa route
+pnpm check           # biome lint + format check
+pnpm format          # biome format --write
 ```
 
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+- **shadcn/ui**: `pnpm dlx shadcn@latest add <component>` — không tự viết API component, luôn dùng CLI.
+- **Paraglide i18n**: sửa `messages/vi.json` / `messages/en.json`, sau đó chạy `pnpm dev`/`pnpm build` (hoặc `pnpm exec paraglide-js compile --project ./project.inlang --outdir ./src/paraglide`) để regenerate `src/paraglide/*`. Không sửa tay các file trong `src/paraglide/`.
+- **Route files**: thêm/sửa file trong `src/routes/`, sau đó chạy `pnpm generate-routes`. Không sửa tay `src/routeTree.gen.ts`.
+- Chi tiết kế hoạch triển khai và nhật ký thay đổi: xem [`docs/implementation-plan.md`](docs/implementation-plan.md) và [`docs/process.md`](docs/process.md).

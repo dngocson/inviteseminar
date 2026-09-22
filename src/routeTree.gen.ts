@@ -11,6 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as ApiRsvpRouteImport } from './routes/api/rsvp'
+import { Route as ApiAdminExportRouteImport } from './routes/api/admin/export'
+import { Route as ApiAdminGuestsRouteImport } from './routes/api/admin/guests'
+import { Route as ApiAdminLoginRouteImport } from './routes/api/admin/login'
+import { Route as ApiAdminLogoutRouteImport } from './routes/api/admin/logout'
+import { Route as ApiAdminSessionRouteImport } from './routes/api/admin/session'
+import { Route as ApiAdminStatsRouteImport } from './routes/api/admin/stats'
+import { Route as ApiInvitationsCodeRouteImport } from './routes/api/invitations.$code'
+import { Route as ApiAdminGuestsIdRouteImport } from './routes/api/admin/guests.$id'
+import { Route as ApiAdminGuestsIdRegenerateRouteImport } from './routes/api/admin/guests.$id.regenerate'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +34,181 @@ const McpRoute = McpRouteImport.update({
   path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRsvpRoute = ApiRsvpRouteImport.update({
+  id: '/api/rsvp',
+  path: '/api/rsvp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminExportRoute = ApiAdminExportRouteImport.update({
+  id: '/api/admin/export',
+  path: '/api/admin/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminGuestsRoute = ApiAdminGuestsRouteImport.update({
+  id: '/api/admin/guests',
+  path: '/api/admin/guests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminLoginRoute = ApiAdminLoginRouteImport.update({
+  id: '/api/admin/login',
+  path: '/api/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminLogoutRoute = ApiAdminLogoutRouteImport.update({
+  id: '/api/admin/logout',
+  path: '/api/admin/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSessionRoute = ApiAdminSessionRouteImport.update({
+  id: '/api/admin/session',
+  path: '/api/admin/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminStatsRoute = ApiAdminStatsRouteImport.update({
+  id: '/api/admin/stats',
+  path: '/api/admin/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiInvitationsCodeRoute = ApiInvitationsCodeRouteImport.update({
+  id: '/api/invitations/$code',
+  path: '/api/invitations/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminGuestsIdRoute = ApiAdminGuestsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiAdminGuestsRoute,
+} as any)
+const ApiAdminGuestsIdRegenerateRoute =
+  ApiAdminGuestsIdRegenerateRouteImport.update({
+    id: '/regenerate',
+    path: '/regenerate',
+    getParentRoute: () => ApiAdminGuestsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/mcp': typeof McpRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/api/rsvp': typeof ApiRsvpRoute
+  '/admin/': typeof AdminIndexRoute
+  '/api/admin/export': typeof ApiAdminExportRoute
+  '/api/admin/guests': typeof ApiAdminGuestsRouteWithChildren
+  '/api/admin/login': typeof ApiAdminLoginRoute
+  '/api/admin/logout': typeof ApiAdminLogoutRoute
+  '/api/admin/session': typeof ApiAdminSessionRoute
+  '/api/admin/stats': typeof ApiAdminStatsRoute
+  '/api/invitations/$code': typeof ApiInvitationsCodeRoute
+  '/api/admin/guests/$id': typeof ApiAdminGuestsIdRouteWithChildren
+  '/api/admin/guests/$id/regenerate': typeof ApiAdminGuestsIdRegenerateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/mcp': typeof McpRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/api/rsvp': typeof ApiRsvpRoute
+  '/admin': typeof AdminIndexRoute
+  '/api/admin/export': typeof ApiAdminExportRoute
+  '/api/admin/guests': typeof ApiAdminGuestsRouteWithChildren
+  '/api/admin/login': typeof ApiAdminLoginRoute
+  '/api/admin/logout': typeof ApiAdminLogoutRoute
+  '/api/admin/session': typeof ApiAdminSessionRoute
+  '/api/admin/stats': typeof ApiAdminStatsRoute
+  '/api/invitations/$code': typeof ApiInvitationsCodeRoute
+  '/api/admin/guests/$id': typeof ApiAdminGuestsIdRouteWithChildren
+  '/api/admin/guests/$id/regenerate': typeof ApiAdminGuestsIdRegenerateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/mcp': typeof McpRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/api/rsvp': typeof ApiRsvpRoute
+  '/admin/': typeof AdminIndexRoute
+  '/api/admin/export': typeof ApiAdminExportRoute
+  '/api/admin/guests': typeof ApiAdminGuestsRouteWithChildren
+  '/api/admin/login': typeof ApiAdminLoginRoute
+  '/api/admin/logout': typeof ApiAdminLogoutRoute
+  '/api/admin/session': typeof ApiAdminSessionRoute
+  '/api/admin/stats': typeof ApiAdminStatsRoute
+  '/api/invitations/$code': typeof ApiInvitationsCodeRoute
+  '/api/admin/guests/$id': typeof ApiAdminGuestsIdRouteWithChildren
+  '/api/admin/guests/$id/regenerate': typeof ApiAdminGuestsIdRegenerateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/mcp'
+  fullPaths:
+    | '/'
+    | '/mcp'
+    | '/admin/login'
+    | '/api/rsvp'
+    | '/admin/'
+    | '/api/admin/export'
+    | '/api/admin/guests'
+    | '/api/admin/login'
+    | '/api/admin/logout'
+    | '/api/admin/session'
+    | '/api/admin/stats'
+    | '/api/invitations/$code'
+    | '/api/admin/guests/$id'
+    | '/api/admin/guests/$id/regenerate'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/mcp'
-  id: '__root__' | '/' | '/mcp'
+  to:
+    | '/'
+    | '/mcp'
+    | '/admin/login'
+    | '/api/rsvp'
+    | '/admin'
+    | '/api/admin/export'
+    | '/api/admin/guests'
+    | '/api/admin/login'
+    | '/api/admin/logout'
+    | '/api/admin/session'
+    | '/api/admin/stats'
+    | '/api/invitations/$code'
+    | '/api/admin/guests/$id'
+    | '/api/admin/guests/$id/regenerate'
+  id:
+    | '__root__'
+    | '/'
+    | '/mcp'
+    | '/admin/login'
+    | '/api/rsvp'
+    | '/admin/'
+    | '/api/admin/export'
+    | '/api/admin/guests'
+    | '/api/admin/login'
+    | '/api/admin/logout'
+    | '/api/admin/session'
+    | '/api/admin/stats'
+    | '/api/invitations/$code'
+    | '/api/admin/guests/$id'
+    | '/api/admin/guests/$id/regenerate'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   McpRoute: typeof McpRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  ApiRsvpRoute: typeof ApiRsvpRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  ApiAdminExportRoute: typeof ApiAdminExportRoute
+  ApiAdminGuestsRoute: typeof ApiAdminGuestsRouteWithChildren
+  ApiAdminLoginRoute: typeof ApiAdminLoginRoute
+  ApiAdminLogoutRoute: typeof ApiAdminLogoutRoute
+  ApiAdminSessionRoute: typeof ApiAdminSessionRoute
+  ApiAdminStatsRoute: typeof ApiAdminStatsRoute
+  ApiInvitationsCodeRoute: typeof ApiInvitationsCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +227,129 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/rsvp': {
+      id: '/api/rsvp'
+      path: '/api/rsvp'
+      fullPath: '/api/rsvp'
+      preLoaderRoute: typeof ApiRsvpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/export': {
+      id: '/api/admin/export'
+      path: '/api/admin/export'
+      fullPath: '/api/admin/export'
+      preLoaderRoute: typeof ApiAdminExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/guests': {
+      id: '/api/admin/guests'
+      path: '/api/admin/guests'
+      fullPath: '/api/admin/guests'
+      preLoaderRoute: typeof ApiAdminGuestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/login': {
+      id: '/api/admin/login'
+      path: '/api/admin/login'
+      fullPath: '/api/admin/login'
+      preLoaderRoute: typeof ApiAdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/logout': {
+      id: '/api/admin/logout'
+      path: '/api/admin/logout'
+      fullPath: '/api/admin/logout'
+      preLoaderRoute: typeof ApiAdminLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/session': {
+      id: '/api/admin/session'
+      path: '/api/admin/session'
+      fullPath: '/api/admin/session'
+      preLoaderRoute: typeof ApiAdminSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/stats': {
+      id: '/api/admin/stats'
+      path: '/api/admin/stats'
+      fullPath: '/api/admin/stats'
+      preLoaderRoute: typeof ApiAdminStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/invitations/$code': {
+      id: '/api/invitations/$code'
+      path: '/api/invitations/$code'
+      fullPath: '/api/invitations/$code'
+      preLoaderRoute: typeof ApiInvitationsCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/guests/$id': {
+      id: '/api/admin/guests/$id'
+      path: '/$id'
+      fullPath: '/api/admin/guests/$id'
+      preLoaderRoute: typeof ApiAdminGuestsIdRouteImport
+      parentRoute: typeof ApiAdminGuestsRoute
+    }
+    '/api/admin/guests/$id/regenerate': {
+      id: '/api/admin/guests/$id/regenerate'
+      path: '/regenerate'
+      fullPath: '/api/admin/guests/$id/regenerate'
+      preLoaderRoute: typeof ApiAdminGuestsIdRegenerateRouteImport
+      parentRoute: typeof ApiAdminGuestsIdRoute
+    }
   }
 }
+
+interface ApiAdminGuestsIdRouteChildren {
+  ApiAdminGuestsIdRegenerateRoute: typeof ApiAdminGuestsIdRegenerateRoute
+}
+
+const ApiAdminGuestsIdRouteChildren: ApiAdminGuestsIdRouteChildren = {
+  ApiAdminGuestsIdRegenerateRoute: ApiAdminGuestsIdRegenerateRoute,
+}
+
+const ApiAdminGuestsIdRouteWithChildren =
+  ApiAdminGuestsIdRoute._addFileChildren(ApiAdminGuestsIdRouteChildren)
+
+interface ApiAdminGuestsRouteChildren {
+  ApiAdminGuestsIdRoute: typeof ApiAdminGuestsIdRouteWithChildren
+}
+
+const ApiAdminGuestsRouteChildren: ApiAdminGuestsRouteChildren = {
+  ApiAdminGuestsIdRoute: ApiAdminGuestsIdRouteWithChildren,
+}
+
+const ApiAdminGuestsRouteWithChildren = ApiAdminGuestsRoute._addFileChildren(
+  ApiAdminGuestsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   McpRoute: McpRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  ApiRsvpRoute: ApiRsvpRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  ApiAdminExportRoute: ApiAdminExportRoute,
+  ApiAdminGuestsRoute: ApiAdminGuestsRouteWithChildren,
+  ApiAdminLoginRoute: ApiAdminLoginRoute,
+  ApiAdminLogoutRoute: ApiAdminLogoutRoute,
+  ApiAdminSessionRoute: ApiAdminSessionRoute,
+  ApiAdminStatsRoute: ApiAdminStatsRoute,
+  ApiInvitationsCodeRoute: ApiInvitationsCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

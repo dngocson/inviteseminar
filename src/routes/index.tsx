@@ -1,14 +1,90 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/')({ component: Home })
+import { HeroSection } from "#/components/invitation/HeroSection";
+import { InvitationShell } from "#/components/invitation/InvitationShell";
+import { InvitationStatusScreen } from "#/components/invitation/InvitationStatusScreen";
+import { OutroSection } from "#/components/invitation/OutroSection";
+import { RsvpSection } from "#/components/invitation/RsvpSection";
+import { ScheduleSection } from "#/components/invitation/ScheduleSection";
+import { TimelineSection } from "#/components/invitation/TimelineSection";
+import { eventConfig, localized } from "#/content/event";
+import { useInvitationQuery } from "#/hooks/use-invitation";
+import { ApiRequestError } from "#/lib/api-client";
+import { useLocaleSync } from "#/lib/locale";
+import { invitationSearchSchema } from "#/lib/schemas";
+import { m } from "#/paraglide/messages";
+
+export const Route = createFileRoute("/")({
+	validateSearch: invitationSearchSchema,
+	head: () => ({
+		meta: [
+			{ title: m.site_title() },
+			{ name: "description", content: m.site_description() },
+		],
+	}),
+	component: Home,
+});
 
 function Home() {
-  return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
-      <p className="mt-4 text-lg">
-        Edit <code>src/routes/index.tsx</code> to get started.
-      </p>
-    </div>
-  )
+	const { k: code, l: locale } = Route.useSearch();
+	useLocaleSync(locale);
+
+	if (!code) {
+		return (
+			<InvitationStatusScreen
+				title={m.invite_missing_title()}
+				body={m.invite_missing_body()}
+			/>
+		);
+	}
+
+	return <InvitationContent code={code} locale={locale} />;
+}
+
+function InvitationContent({
+	code,
+	locale,
+}: {
+	code: string;
+	locale: "vi" | "en";
+}) {
+	const { data: invitation, isPending, error } = useInvitationQuery(code);
+
+	if (isPending) {
+		return <InvitationStatusScreen title={m.invite_loading()} body="" />;
+	}
+
+	if (error) {
+		const isNotFound =
+			error instanceof ApiRequestError && error.code === "NOT_FOUND";
+		return (
+			<InvitationStatusScreen
+				title={isNotFound ? m.invite_invalid_title() : m.invite_error_title()}
+				body={isNotFound ? m.invite_invalid_body() : m.invite_error_body()}
+			/>
+		);
+	}
+
+	const seminarName = localized(eventConfig.seminarName, locale);
+	const organizer = localized(eventConfig.organizer, locale);
+
+	return (
+		<InvitationShell locale={locale}>
+			<HeroSection
+				fullName={invitation.fullName}
+				seminarName={seminarName}
+				organizer={organizer}
+			/>
+			<ScheduleSection
+				startsAt={eventConfig.startsAt}
+				venueName={localized(eventConfig.venue.name, locale)}
+				venueAddress={localized(eventConfig.venue.address, locale)}
+				mapUrl={eventConfig.venue.mapUrl}
+				locale={locale}
+			/>
+			<TimelineSection items={[...eventConfig.timeline]} locale={locale} />
+			<RsvpSection code={code} invitation={invitation} />
+			<OutroSection organizer={organizer} />
+		</InvitationShell>
+	);
 }
