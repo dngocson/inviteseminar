@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import Papa from "papaparse";
 
 import { ApiError, withApiErrorHandling } from "#/lib/api-response";
 import { requireAdminUser } from "#/lib/auth";
+import { buildGuestCsv } from "#/lib/guest-csv";
 import { getSupabaseAdminClient } from "#/lib/supabase/admin";
 
 const GUEST_EXPORT_SELECT =
@@ -28,22 +28,20 @@ export const Route = createFileRoute("/api/admin/export")({
 						? (row.rsvp[0] ?? null)
 						: row.rsvp;
 					return {
-						"Mã mời": row.invite_code,
-						"Họ tên": row.full_name,
-						"Số người tối đa": row.max_attendees,
-						"Ngôn ngữ": row.locale,
-						"Trạng thái": rsvp
-							? rsvp.attending
-								? "Tham dự"
-								: "Từ chối"
-							: "Chưa phản hồi",
-						"Số người tham dự": rsvp?.attendee_count ?? "",
-						"Lời nhắn": rsvp?.message ?? "",
-						"Cập nhật lúc": rsvp?.updated_at ?? "",
+						inviteCode: row.invite_code,
+						fullName: row.full_name,
+						maxAttendees: row.max_attendees,
+						locale: row.locale,
+						rsvp: rsvp && {
+							attending: rsvp.attending,
+							attendeeCount: rsvp.attendee_count,
+							message: rsvp.message,
+							updatedAt: rsvp.updated_at,
+						},
 					};
 				});
 
-				const csv = Papa.unparse(rows);
+				const csv = buildGuestCsv(rows);
 				// UTF-8 BOM so Excel opens Vietnamese diacritics correctly.
 				const body = `﻿${csv}`;
 

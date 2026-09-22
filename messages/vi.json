@@ -104,6 +104,8 @@
   "admin_delete_confirm_body": "Hành động này không thể hoàn tác. Đường dẫn mời của khách sẽ ngừng hoạt động.",
   "admin_show_qr": "Mã QR",
   "admin_qr_dialog_title": "Mã QR mời {name}",
+  "admin_qr_scan_hint": "Quét mã để mở thiệp mời — có thể lưu ảnh và gửi qua Zalo, email hoặc in ra.",
+  "admin_qr_image_caption": "Quét mã để mở thiệp mời",
   "admin_qr_download": "Tải xuống PNG",
   "admin_regenerate_code": "Tạo lại mã mời",
   "admin_regenerate_confirm_title": "Tạo lại mã mời?",

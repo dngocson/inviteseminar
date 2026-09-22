@@ -104,6 +104,8 @@
   "admin_delete_confirm_body": "This action cannot be undone. The guest's invite link will stop working.",
   "admin_show_qr": "QR code",
   "admin_qr_dialog_title": "QR code for {name}",
+  "admin_qr_scan_hint": "Scan to open the invitation — save the image to send over Zalo, email, or print.",
+  "admin_qr_image_caption": "Scan to open the invitation",
   "admin_qr_download": "Download PNG",
   "admin_regenerate_code": "Regenerate invite code",
   "admin_regenerate_confirm_title": "Regenerate invite code?",

@@ -1,3 +1,4 @@
+import { Download } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
@@ -11,6 +12,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "#/components/ui/dialog";
+import { buildQrCardCanvas } from "#/lib/qr-card";
 import { m } from "#/paraglide/messages";
 
 interface QrCodeDialogProps {
@@ -27,12 +29,24 @@ export function QrCodeDialog({
 	const [open, setOpen] = useState(false);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
-	function downloadPng() {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
+	async function downloadPng() {
+		const qrCanvas = canvasRef.current;
+		if (!qrCanvas) return;
+
+		try {
+			await document.fonts.ready;
+		} catch {
+			// best-effort — falls back to whatever font is already available
+		}
+
+		const card = buildQrCardCanvas(qrCanvas, {
+			name: guestName,
+			caption: m.admin_qr_image_caption(),
+		});
+
 		const link = document.createElement("a");
 		link.download = `qr-${guestName.trim().replace(/\s+/g, "-").toLowerCase()}.png`;
-		link.href = canvas.toDataURL("image/png");
+		link.href = card.toDataURL("image/png");
 		link.click();
 	}
 
@@ -65,6 +79,9 @@ export function QrCodeDialog({
 							level="M"
 						/>
 					</div>
+					<p className="text-center text-xs text-muted-foreground">
+						{m.admin_qr_scan_hint()}
+					</p>
 					<button
 						type="button"
 						onClick={copyLink}
@@ -75,16 +92,21 @@ export function QrCodeDialog({
 					</button>
 				</div>
 
-				<DialogFooter>
+				<DialogFooter className="flex-col sm:flex-col">
 					<Button
 						type="button"
-						variant="outline"
+						onClick={downloadPng}
+						className="h-11 w-full px-6"
+					>
+						<Download /> {m.admin_qr_download()}
+					</Button>
+					<Button
+						type="button"
+						variant="ghost"
+						className="w-full"
 						onClick={() => setOpen(false)}
 					>
 						{m.admin_cancel()}
-					</Button>
-					<Button type="button" onClick={downloadPng}>
-						{m.admin_qr_download()}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
