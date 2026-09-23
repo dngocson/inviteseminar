@@ -56,6 +56,7 @@ export const Route = createFileRoute("/api/admin/guests")({
 							full_name: parsed.data.fullName,
 							max_attendees: parsed.data.maxAttendees,
 							locale: parsed.data.locale,
+							note: parsed.data.note || null,
 							created_by: user.id,
 						})
 						.select(GUEST_WITH_RSVP_SELECT)

@@ -90,10 +90,12 @@
   "admin_filter_pending": "Chưa phản hồi",
 
   "admin_table_name": "Họ tên",
+  "admin_table_responder": "Người phản hồi",
   "admin_table_code": "Mã mời",
   "admin_table_status": "Trạng thái",
   "admin_table_count": "Số người",
   "admin_table_message": "Lời nhắn",
+  "admin_table_note": "Ghi chú",
   "admin_table_updated": "Cập nhật",
   "admin_table_actions": "Thao tác",
 
@@ -119,6 +121,7 @@
   "admin_guest_locale_label": "Ngôn ngữ hiển thị thiệp",
   "admin_guest_locale_vi": "Tiếng Việt",
   "admin_guest_locale_en": "Tiếng Anh",
+  "admin_guest_note_label": "Ghi chú nội bộ (không hiển thị cho khách)",
   "admin_save": "Lưu",
   "admin_cancel": "Hủy",
   "admin_confirm": "Xác nhận",

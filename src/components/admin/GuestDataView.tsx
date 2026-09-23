@@ -216,10 +216,12 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 							<TableHeader>
 								<TableRow className="hover:bg-transparent">
 									<TableHead>{m.admin_table_name()}</TableHead>
+									<TableHead>{m.admin_table_responder()}</TableHead>
 									<TableHead>{m.admin_table_code()}</TableHead>
 									<TableHead>{m.admin_table_status()}</TableHead>
 									<TableHead>{m.admin_table_count()}</TableHead>
 									<TableHead>{m.admin_table_message()}</TableHead>
+									<TableHead>{m.admin_table_note()}</TableHead>
 									<TableHead>{m.admin_table_updated()}</TableHead>
 									<TableHead className="text-right">
 										{m.admin_table_actions()}
@@ -231,6 +233,9 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 									<TableRow key={guest.id}>
 										<TableCell className="font-medium">
 											{guest.fullName}
+										</TableCell>
+										<TableCell className="text-muted-foreground">
+											{guest.rsvp?.responderName || "—"}
 										</TableCell>
 										<TableCell className="font-mono text-xs text-muted-foreground">
 											{guest.inviteCode}
@@ -246,6 +251,9 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 										</TableCell>
 										<TableCell className="max-w-48 truncate text-muted-foreground">
 											{guest.rsvp?.message || "—"}
+										</TableCell>
+										<TableCell className="max-w-48 truncate text-muted-foreground">
+											{guest.note || "—"}
 										</TableCell>
 										<TableCell className="text-xs text-muted-foreground">
 											{new Date(
@@ -274,9 +282,19 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 									</div>
 									<StatusBadge status={guestStatus(guest)} />
 								</div>
+								{guest.rsvp?.responderName && (
+									<p className="mt-1 text-xs text-muted-foreground">
+										{m.admin_table_responder()}: {guest.rsvp.responderName}
+									</p>
+								)}
 								{guest.rsvp?.message && (
 									<p className="mt-2 text-sm text-muted-foreground">
 										{guest.rsvp.message}
+									</p>
+								)}
+								{guest.note && (
+									<p className="mt-2 text-sm text-muted-foreground italic">
+										{guest.note}
 									</p>
 								)}
 								<p className="mt-1 text-xs text-muted-foreground">

@@ -23,7 +23,10 @@ export type InvitationSearch = z.infer<typeof invitationSearchSchema>;
 // ---------------------------------------------------------------------------
 // Guest CRUD (admin)
 // ---------------------------------------------------------------------------
-export const maxAttendeesSchema = z.number().int().min(1).max(5);
+export const maxAttendeesSchema = z.number().int().min(1).max(10);
+
+// Internal admin note about a guest — never surfaced on the invitation card.
+export const guestNoteSchema = z.string().trim().max(1000);
 
 export const guestCreateSchema = z.object({
 	fullName: z.string().trim().min(1).max(200),
@@ -32,6 +35,7 @@ export const guestCreateSchema = z.object({
 	// the admin generates (`&l=vi|en`) — the guest can still switch language
 	// on the card itself; this just picks which one they land on.
 	locale: localeSchema.default("vi"),
+	note: guestNoteSchema.optional().default(""),
 });
 export type GuestCreateInput = z.infer<typeof guestCreateSchema>;
 
@@ -39,6 +43,7 @@ export const guestUpdateSchema = z.object({
 	fullName: z.string().trim().min(1).max(200).optional(),
 	maxAttendees: maxAttendeesSchema.optional(),
 	locale: localeSchema.optional(),
+	note: guestNoteSchema.optional(),
 });
 export type GuestUpdateInput = z.infer<typeof guestUpdateSchema>;
 
@@ -48,6 +53,7 @@ export const guestDto = z.object({
 	fullName: z.string(),
 	maxAttendees: maxAttendeesSchema,
 	locale: localeSchema,
+	note: z.string().nullable(),
 	createdAt: z.iso.datetime(),
 	updatedAt: z.iso.datetime(),
 });
@@ -60,7 +66,7 @@ export const rsvpDto = z.object({
 	responderName: z.string(),
 	message: z.string().nullable(),
 	attending: z.boolean(),
-	attendeeCount: z.number().int().min(0).max(5),
+	attendeeCount: z.number().int().min(0).max(10),
 	updatedAt: z.iso.datetime(),
 });
 export type RsvpDto = z.infer<typeof rsvpDto>;
@@ -81,15 +87,15 @@ export const rsvpSubmitSchema = z
 		responderName: z.string().trim().min(1).max(200),
 		message: z.string().trim().max(1000).optional().default(""),
 		attending: z.boolean(),
-		attendeeCount: z.number().int().min(0).max(5).default(0),
+		attendeeCount: z.number().int().min(0).max(10).default(0),
 	})
 	.refine(
 		(data) =>
 			data.attending
-				? data.attendeeCount >= 1 && data.attendeeCount <= 5
+				? data.attendeeCount >= 1 && data.attendeeCount <= 10
 				: data.attendeeCount === 0,
 		{
-			message: "attendeeCount must be 0 when declining, 1-5 when attending",
+			message: "attendeeCount must be 0 when declining, 1-10 when attending",
 			path: ["attendeeCount"],
 		},
 	);

@@ -37,7 +37,7 @@ describe("invitationSearchSchema", () => {
 describe("rsvpSubmitSchema attendance/count consistency", () => {
 	const base = { code: "Ab3x9Q2m", responderName: "Nguyen Van A" };
 
-	it("accepts attending=true with a count between 1 and 5", () => {
+	it("accepts attending=true with a count between 1 and 10", () => {
 		expect(() =>
 			rsvpSubmitSchema.parse({ ...base, attending: true, attendeeCount: 3 }),
 		).not.toThrow();
@@ -49,9 +49,9 @@ describe("rsvpSubmitSchema attendance/count consistency", () => {
 		).toThrow();
 	});
 
-	it("rejects attending=true with count above 5", () => {
+	it("rejects attending=true with count above 10", () => {
 		expect(() =>
-			rsvpSubmitSchema.parse({ ...base, attending: true, attendeeCount: 6 }),
+			rsvpSubmitSchema.parse({ ...base, attending: true, attendeeCount: 11 }),
 		).toThrow();
 	});
 
@@ -83,12 +83,12 @@ describe("guestCreateSchema", () => {
 		expect(() => guestCreateSchema.parse({ fullName: "  " })).toThrow();
 	});
 
-	it("rejects maxAttendees outside 1..5", () => {
+	it("rejects maxAttendees outside 1..10", () => {
 		expect(() =>
 			guestCreateSchema.parse({ fullName: "Guest", maxAttendees: 0 }),
 		).toThrow();
 		expect(() =>
-			guestCreateSchema.parse({ fullName: "Guest", maxAttendees: 6 }),
+			guestCreateSchema.parse({ fullName: "Guest", maxAttendees: 11 }),
 		).toThrow();
 	});
 });

@@ -25,6 +25,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
+import { Textarea } from "#/components/ui/textarea";
 import {
 	useCreateGuestMutation,
 	useUpdateGuestMutation,
@@ -49,6 +50,7 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 			fullName: guest?.fullName ?? "",
 			maxAttendees: guest?.maxAttendees ?? 5,
 			locale: guest?.locale ?? ("vi" as Locale),
+			note: guest?.note ?? "",
 		},
 		onSubmit: async ({ value }) => {
 			if (guest) {
@@ -129,11 +131,13 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 											<SelectValue />
 										</SelectTrigger>
 										<SelectContent>
-											{[1, 2, 3, 4, 5].map((count) => (
-												<SelectItem key={count} value={String(count)}>
-													{count}
-												</SelectItem>
-											))}
+											{Array.from({ length: 10 }, (_, i) => i + 1).map(
+												(count) => (
+													<SelectItem key={count} value={String(count)}>
+														{count}
+													</SelectItem>
+												),
+											)}
 										</SelectContent>
 									</Select>
 								</FieldContent>
@@ -172,6 +176,25 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 											</label>
 										</div>
 									</RadioGroup>
+								</FieldContent>
+							</Field>
+						)}
+					</form.Field>
+
+					<form.Field name="note">
+						{(field) => (
+							<Field>
+								<FieldContent>
+									<FieldLabel htmlFor={field.name}>
+										{m.admin_guest_note_label()}
+									</FieldLabel>
+									<Textarea
+										id={field.name}
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.target.value)}
+										onBlur={field.handleBlur}
+										rows={3}
+									/>
 								</FieldContent>
 							</Field>
 						)}

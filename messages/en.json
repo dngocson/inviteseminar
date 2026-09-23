@@ -90,10 +90,12 @@
   "admin_filter_pending": "Pending",
 
   "admin_table_name": "Name",
+  "admin_table_responder": "Responder",
   "admin_table_code": "Invite code",
   "admin_table_status": "Status",
   "admin_table_count": "Count",
   "admin_table_message": "Message",
+  "admin_table_note": "Note",
   "admin_table_updated": "Updated",
   "admin_table_actions": "Actions",
 
@@ -119,6 +121,7 @@
   "admin_guest_locale_label": "Card display language",
   "admin_guest_locale_vi": "Vietnamese",
   "admin_guest_locale_en": "English",
+  "admin_guest_note_label": "Internal note (not shown to guest)",
   "admin_save": "Save",
   "admin_cancel": "Cancel",
   "admin_confirm": "Confirm",

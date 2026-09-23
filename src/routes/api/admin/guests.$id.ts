@@ -49,6 +49,9 @@ export const Route = createFileRoute("/api/admin/guests/$id")({
 						...(parsed.data.locale !== undefined && {
 							locale: parsed.data.locale,
 						}),
+						...(parsed.data.note !== undefined && {
+							note: parsed.data.note || null,
+						}),
 					})
 					.eq("id", id)
 					.select(GUEST_WITH_RSVP_SELECT)
