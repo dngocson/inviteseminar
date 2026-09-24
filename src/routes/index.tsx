@@ -54,7 +54,7 @@ function EventContent({ locale }: { locale: "vi" | "en" }) {
 
 function EventDetails({ locale }: { locale: "vi" | "en" }) {
 	return (
-		<>
+		<div className="invitation-details mx-auto grid max-w-6xl lg:grid-cols-2">
 			<ScheduleSection
 				startsAt={eventConfig.startsAt}
 				venueName={localized(eventConfig.venue.name, locale)}
@@ -63,7 +63,7 @@ function EventDetails({ locale }: { locale: "vi" | "en" }) {
 				locale={locale}
 			/>
 			<TimelineSection items={[...eventConfig.timeline]} locale={locale} />
-		</>
+		</div>
 	);
 }
 
@@ -95,7 +95,7 @@ function InvitationContent({
 	const organizer = localized(eventConfig.organizer, locale);
 
 	return (
-		<InvitationShell locale={locale}>
+		<InvitationShell locale={locale} hasRsvp>
 			<HeroSection
 				fullName={invitation.fullName}
 				seminarName={seminarName}

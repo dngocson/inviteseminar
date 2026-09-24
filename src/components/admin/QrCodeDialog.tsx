@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { Copy, Download } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
@@ -7,6 +7,7 @@ import { Button } from "#/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -62,15 +63,16 @@ export function QrCodeDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>{trigger}</DialogTrigger>
-			<DialogContent className="sm:max-w-xs">
+			<DialogContent className="sm:max-w-sm">
 				<DialogHeader>
 					<DialogTitle>
 						{m.admin_qr_dialog_title({ name: guestName })}
 					</DialogTitle>
+					<DialogDescription>{m.admin_qr_scan_hint()}</DialogDescription>
 				</DialogHeader>
 
 				<div className="flex flex-col items-center gap-4 py-2">
-					<div className="rounded-2xl border bg-white p-4">
+					<div className="rounded-lg border bg-white p-5">
 						<QRCodeCanvas
 							ref={canvasRef}
 							value={inviteUrl}
@@ -79,17 +81,16 @@ export function QrCodeDialog({
 							level="M"
 						/>
 					</div>
-					<p className="text-center text-xs text-muted-foreground">
-						{m.admin_qr_scan_hint()}
-					</p>
-					<button
+					<Button
 						type="button"
+						variant="outline"
 						onClick={copyLink}
-						className="max-w-full truncate text-xs text-muted-foreground underline-offset-4 hover:underline"
+						className="w-full"
 						title={inviteUrl}
 					>
-						{inviteUrl}
-					</button>
+						<Copy data-icon="inline-start" />
+						{m.admin_copy_link()}
+					</Button>
 				</div>
 
 				<DialogFooter className="flex-col sm:flex-col">
@@ -98,7 +99,7 @@ export function QrCodeDialog({
 						onClick={downloadPng}
 						className="h-11 w-full px-6"
 					>
-						<Download /> {m.admin_qr_download()}
+						<Download data-icon="inline-start" /> {m.admin_qr_download()}
 					</Button>
 					<Button
 						type="button"

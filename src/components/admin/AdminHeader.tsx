@@ -1,5 +1,5 @@
-import { useNavigate } from "@tanstack/react-router";
-import { LogOut } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowUpRight, Atom, LogOut } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { eventConfig, localized } from "#/content/event";
 import { useLogoutMutation } from "#/hooks/use-admin-auth";
@@ -18,49 +18,70 @@ export function AdminHeader({ email, onLocaleChange }: AdminHeaderProps) {
 	const locale = getLocale();
 
 	return (
-		<header className="flex flex-wrap items-start justify-between gap-4 border-b pb-5">
-			<div>
-				<p className="text-xs font-semibold tracking-wide text-primary">
-					{localized(eventConfig.seminarName, locale)}
-				</p>
-				<h1
-					className="mt-1 text-2xl font-semibold"
-					style={{ fontFamily: "'Fraunces', Georgia, serif" }}
-				>
-					{m.admin_dashboard_title()}
-				</h1>
-				{email && <p className="mt-1 text-xs text-muted-foreground">{email}</p>}
-			</div>
-			<div className="flex items-center gap-2">
-				<div className="flex overflow-hidden rounded-full border">
-					{locales.map((l) => (
-						<button
-							key={l}
-							type="button"
-							aria-pressed={l === locale}
-							className={
-								l === locale
-									? "bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground uppercase"
-									: "px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase hover:bg-accent"
-							}
-							onClick={() => {
-								setLocale(l, { reload: false });
-								onLocaleChange();
-							}}
-						>
-							{l}
-						</button>
-					))}
+		<header className="admin-header flex flex-col gap-8 pb-7">
+			<div className="admin-masthead flex flex-wrap items-center justify-between gap-5 pb-5">
+				<div className="flex items-center gap-3 text-primary">
+					<Atom
+						className="size-8 shrink-0"
+						strokeWidth={1.25}
+						aria-hidden="true"
+					/>
+					<span className="text-sm font-semibold">
+						{m.admin_workspace_label()}
+					</span>
 				</div>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={async () => {
-						await logoutMutation.mutateAsync();
-						await navigate({ to: "/admin/login" });
-					}}
-				>
-					<LogOut /> {m.admin_logout()}
+				<div className="flex flex-wrap items-center gap-3">
+					{email && (
+						<p className="hidden max-w-60 truncate text-xs text-muted-foreground xl:block">
+							{email}
+						</p>
+					)}
+					<div className="flex overflow-hidden rounded-md border bg-card">
+						{locales.map((l) => (
+							<button
+								key={l}
+								type="button"
+								aria-pressed={l === locale}
+								className={
+									l === locale
+										? "bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground uppercase"
+										: "px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase hover:bg-accent"
+								}
+								onClick={() => {
+									setLocale(l, { reload: false });
+									onLocaleChange();
+								}}
+							>
+								{l}
+							</button>
+						))}
+					</div>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={async () => {
+							await logoutMutation.mutateAsync();
+							await navigate({ to: "/admin/login" });
+						}}
+					>
+						<LogOut data-icon="inline-start" /> {m.admin_logout()}
+					</Button>
+				</div>
+			</div>
+			<div className="flex flex-wrap items-end justify-between gap-5">
+				<div className="min-w-0 max-w-2xl">
+					<h1 className="display-title text-3xl font-medium sm:text-4xl">
+						{m.admin_dashboard_title()}
+					</h1>
+					<p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+						{localized(eventConfig.seminarName, locale)}
+					</p>
+				</div>
+				<Button variant="outline" asChild>
+					<Link to="/" search={{ l: locale }} target="_blank" rel="noreferrer">
+						{m.admin_open_event()}
+						<ArrowUpRight data-icon="inline-end" />
+					</Link>
 				</Button>
 			</div>
 		</header>

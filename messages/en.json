@@ -75,6 +75,11 @@
 
   "admin_logout": "Sign out",
   "admin_dashboard_title": "Guest management",
+  "admin_workspace_label": "Event administration",
+  "admin_open_event": "View event page",
+  "admin_guest_list_title": "Guest list",
+  "admin_results_count": "{count} of {total} guests",
+  "admin_no_results": "No guests match your search or filter.",
 
   "admin_stats_total": "Total guests",
   "admin_stats_responded": "Responded",

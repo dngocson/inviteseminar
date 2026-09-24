@@ -1,3 +1,4 @@
+import { CircleAlert, LoaderCircle } from "lucide-react";
 import type { ReactNode } from "react";
 import { m } from "#/paraglide/messages";
 
@@ -13,8 +14,21 @@ export function InvitationStatusScreen({
 	action,
 }: InvitationStatusScreenProps) {
 	return (
-		<div className="lab-theme flex min-h-dvh items-center justify-center px-6 py-16">
-			<div className="lab-card w-full max-w-sm rounded-3xl p-8 text-center">
+		<div className="lab-theme invitation-status flex min-h-dvh items-center justify-center px-6 py-16">
+			<div className="w-full max-w-sm text-center">
+				{body ? (
+					<CircleAlert
+						className="mx-auto mb-7 size-12 text-(--mineral-deep)"
+						strokeWidth={1.25}
+						aria-hidden="true"
+					/>
+				) : (
+					<LoaderCircle
+						className="mx-auto mb-7 size-10 animate-spin text-(--mineral-deep)"
+						strokeWidth={1.25}
+						aria-hidden="true"
+					/>
+				)}
 				<p className="lab-kicker mb-3">{m.site_title()}</p>
 				<h1 className="display-title text-2xl font-semibold text-(--carbon)">
 					{title}

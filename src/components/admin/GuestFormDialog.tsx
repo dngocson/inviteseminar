@@ -1,4 +1,5 @@
 import { useForm } from "@tanstack/react-form";
+import { LoaderCircle, Save, UserRound } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { Button } from "#/components/ui/button";
@@ -14,13 +15,17 @@ import {
 	Field,
 	FieldContent,
 	FieldError,
+	FieldGroup,
 	FieldLabel,
+	FieldLegend,
+	FieldSet,
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
@@ -72,92 +77,104 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 			}}
 		>
 			<DialogTrigger asChild>{trigger}</DialogTrigger>
-			<DialogContent>
+			<DialogContent aria-describedby={undefined}>
 				<DialogHeader>
+					<UserRound
+						className="mb-2 size-7 text-primary"
+						strokeWidth={1.5}
+						aria-hidden="true"
+					/>
 					<DialogTitle>
 						{guest ? m.admin_edit_guest() : m.admin_add_guest()}
 					</DialogTitle>
 				</DialogHeader>
 
 				<form
-					className="space-y-4"
+					className="flex flex-col gap-6"
 					onSubmit={(e) => {
 						e.preventDefault();
 						e.stopPropagation();
 						form.handleSubmit();
 					}}
 				>
-					<form.Field
-						name="fullName"
-						validators={{
-							onChange: ({ value }) =>
-								value.trim().length === 0 ? "Required" : undefined,
-						}}
-					>
-						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
-								<FieldContent>
-									<FieldLabel htmlFor={field.name}>
-										{m.admin_guest_name_label()}
-									</FieldLabel>
-									<Input
-										id={field.name}
-										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onBlur={field.handleBlur}
-									/>
-									<FieldError
-										errors={field.state.meta.errors.map((message) => ({
-											message,
-										}))}
-									/>
-								</FieldContent>
-							</Field>
-						)}
-					</form.Field>
+					<FieldGroup>
+						<form.Field
+							name="fullName"
+							validators={{
+								onChange: ({ value }) =>
+									value.trim().length === 0 ? "Required" : undefined,
+							}}
+						>
+							{(field) => (
+								<Field data-invalid={field.state.meta.errors.length > 0}>
+									<FieldContent>
+										<FieldLabel htmlFor={field.name}>
+											{m.admin_guest_name_label()}
+										</FieldLabel>
+										<Input
+											id={field.name}
+											aria-invalid={field.state.meta.errors.length > 0}
+											value={field.state.value}
+											onChange={(e) => field.handleChange(e.target.value)}
+											onBlur={field.handleBlur}
+										/>
+										<FieldError
+											errors={field.state.meta.errors.map((message) => ({
+												message,
+											}))}
+										/>
+									</FieldContent>
+								</Field>
+							)}
+						</form.Field>
 
-					<form.Field name="maxAttendees">
-						{(field) => (
-							<Field>
-								<FieldContent>
-									<FieldLabel htmlFor={field.name}>
-										{m.admin_guest_max_attendees_label()}
-									</FieldLabel>
-									<Select
-										value={String(field.state.value)}
-										onValueChange={(value) => field.handleChange(Number(value))}
-									>
-										<SelectTrigger id={field.name} className="w-full">
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											{Array.from({ length: 10 }, (_, i) => i + 1).map(
-												(count) => (
-													<SelectItem key={count} value={String(count)}>
-														{count}
-													</SelectItem>
-												),
-											)}
-										</SelectContent>
-									</Select>
-								</FieldContent>
-							</Field>
-						)}
-					</form.Field>
+						<form.Field name="maxAttendees">
+							{(field) => (
+								<Field>
+									<FieldContent>
+										<FieldLabel htmlFor={field.name}>
+											{m.admin_guest_max_attendees_label()}
+										</FieldLabel>
+										<Select
+											value={String(field.state.value)}
+											onValueChange={(value) =>
+												field.handleChange(Number(value))
+											}
+										>
+											<SelectTrigger id={field.name} className="w-full">
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectGroup>
+													{Array.from({ length: 10 }, (_, i) => i + 1).map(
+														(count) => (
+															<SelectItem key={count} value={String(count)}>
+																{count}
+															</SelectItem>
+														),
+													)}
+												</SelectGroup>
+											</SelectContent>
+										</Select>
+									</FieldContent>
+								</Field>
+							)}
+						</form.Field>
 
-					<form.Field name="locale">
-						{(field) => (
-							<Field>
-								<FieldContent>
-									<FieldLabel>{m.admin_guest_locale_label()}</FieldLabel>
+						<form.Field name="locale">
+							{(field) => (
+								<FieldSet>
+									<FieldLegend variant="label">
+										{m.admin_guest_locale_label()}
+									</FieldLegend>
 									<RadioGroup
 										value={field.state.value}
 										onValueChange={(value) =>
 											field.handleChange(value as Locale)
 										}
-										className="flex gap-4"
+										className="grid grid-cols-2 gap-3"
 									>
-										<div className="flex items-center gap-2">
+										<div className="choice-option flex min-h-12 items-center gap-2 rounded-md border px-3 py-2">
 											<RadioGroupItem value="vi" id="guest-locale-vi" />
 											<label
 												htmlFor="guest-locale-vi"
@@ -166,7 +183,7 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 												{m.admin_guest_locale_vi()}
 											</label>
 										</div>
-										<div className="flex items-center gap-2">
+										<div className="choice-option flex min-h-12 items-center gap-2 rounded-md border px-3 py-2">
 											<RadioGroupItem value="en" id="guest-locale-en" />
 											<label
 												htmlFor="guest-locale-en"
@@ -176,38 +193,37 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 											</label>
 										</div>
 									</RadioGroup>
-								</FieldContent>
-							</Field>
+								</FieldSet>
+							)}
+						</form.Field>
+
+						<form.Field name="note">
+							{(field) => (
+								<Field>
+									<FieldContent>
+										<FieldLabel htmlFor={field.name}>
+											{m.admin_guest_note_label()}
+										</FieldLabel>
+										<Textarea
+											id={field.name}
+											value={field.state.value}
+											onChange={(e) => field.handleChange(e.target.value)}
+											onBlur={field.handleBlur}
+											rows={3}
+										/>
+									</FieldContent>
+								</Field>
+							)}
+						</form.Field>
+
+						{mutation.error && (
+							<p role="alert" className="text-sm text-destructive">
+								{mutation.error instanceof ApiRequestError
+									? mutation.error.message
+									: m.admin_error_generic()}
+							</p>
 						)}
-					</form.Field>
-
-					<form.Field name="note">
-						{(field) => (
-							<Field>
-								<FieldContent>
-									<FieldLabel htmlFor={field.name}>
-										{m.admin_guest_note_label()}
-									</FieldLabel>
-									<Textarea
-										id={field.name}
-										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onBlur={field.handleBlur}
-										rows={3}
-									/>
-								</FieldContent>
-							</Field>
-						)}
-					</form.Field>
-
-					{mutation.error && (
-						<p role="alert" className="text-sm text-destructive">
-							{mutation.error instanceof ApiRequestError
-								? mutation.error.message
-								: m.admin_error_generic()}
-						</p>
-					)}
-
+					</FieldGroup>
 					<DialogFooter>
 						<Button
 							type="button"
@@ -217,6 +233,14 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 							{m.admin_cancel()}
 						</Button>
 						<Button type="submit" disabled={mutation.isPending}>
+							{mutation.isPending ? (
+								<LoaderCircle
+									data-icon="inline-start"
+									className="animate-spin"
+								/>
+							) : (
+								<Save data-icon="inline-start" />
+							)}
 							{m.admin_save()}
 						</Button>
 					</DialogFooter>

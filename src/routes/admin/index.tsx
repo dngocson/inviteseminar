@@ -1,11 +1,12 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { Download } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 
 import { AdminHeader } from "#/components/admin/AdminHeader";
 import { GuestDataView } from "#/components/admin/GuestDataView";
 import { GuestFormDialog } from "#/components/admin/GuestFormDialog";
 import { StatsGrid } from "#/components/admin/StatsGrid";
 import { Button } from "#/components/ui/button";
+import { Skeleton } from "#/components/ui/skeleton";
 import {
 	useAdminGuestsQuery,
 	useAdminStatsQuery,
@@ -34,28 +35,56 @@ function AdminDashboard() {
 	const statsQuery = useAdminStatsQuery(true);
 
 	return (
-		<div key={localeKey} className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
+		<div
+			key={localeKey}
+			className="admin-workspace mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 sm:px-8 sm:py-10"
+		>
 			<AdminHeader email={adminEmail} onLocaleChange={rerenderForLocale} />
 
 			<StatsGrid stats={statsQuery.data} />
 
-			<div className="flex items-center justify-between gap-3">
-				<GuestFormDialog trigger={<Button>{m.admin_add_guest()}</Button>} />
-				<a
-					href="/api/admin/export"
-					className="flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
-				>
-					<Download className="size-4" /> {m.admin_export_csv()}
-				</a>
-			</div>
+			<section
+				className="flex min-w-0 flex-col gap-5"
+				aria-labelledby="guest-list-heading"
+			>
+				<div className="flex flex-wrap items-center justify-between gap-4">
+					<h2 id="guest-list-heading" className="text-lg font-semibold">
+						{m.admin_guest_list_title()}
+					</h2>
+					<div className="flex flex-wrap items-center gap-2">
+						<GuestFormDialog
+							trigger={
+								<Button>
+									<Plus data-icon="inline-start" />
+									{m.admin_add_guest()}
+								</Button>
+							}
+						/>
+						<Button variant="outline" asChild>
+							<a href="/api/admin/export">
+								<Download data-icon="inline-start" /> {m.admin_export_csv()}
+							</a>
+						</Button>
+					</div>
+				</div>
 
-			{guestsQuery.isPending ? (
-				<p className="text-sm text-muted-foreground">{m.admin_loading()}</p>
-			) : guestsQuery.isError ? (
-				<p className="text-sm text-destructive">{m.admin_error_generic()}</p>
-			) : (
-				<GuestDataView guests={guestsQuery.data} />
-			)}
+				{guestsQuery.isPending ? (
+					<section
+						className="flex flex-col gap-4"
+						aria-busy="true"
+						aria-label={m.admin_loading()}
+					>
+						<Skeleton className="h-10 w-full max-w-sm" />
+						{["first", "second", "third"].map((row) => (
+							<Skeleton key={row} className="h-16 w-full" />
+						))}
+					</section>
+				) : guestsQuery.isError ? (
+					<p className="text-sm text-destructive">{m.admin_error_generic()}</p>
+				) : (
+					<GuestDataView guests={guestsQuery.data} />
+				)}
+			</section>
 		</div>
 	);
 }

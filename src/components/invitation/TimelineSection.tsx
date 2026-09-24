@@ -12,13 +12,16 @@ export function TimelineSection({
 	locale: Locale;
 }) {
 	return (
-		<section className="px-6 py-14">
+		<section
+			id="program"
+			className="invitation-section min-w-0 px-6 py-12 sm:px-10 sm:py-16"
+		>
 			<p className="lab-kicker">{m.timeline_kicker()}</p>
 			<h2 className="display-title mt-2 text-2xl font-semibold text-(--carbon)">
 				{m.timeline_title()}
 			</h2>
 
-			<ol className="mt-6 space-y-5 border-l border-(--lab-line) pl-5">
+			<ol className="mt-7 flex flex-col gap-6 border-l border-(--lab-line) pl-6">
 				{items.map((item, index) => (
 					<motion.li
 						key={item.time}
@@ -32,8 +35,8 @@ export function TimelineSection({
 							ease: [0.16, 1, 0.3, 1],
 						}}
 					>
-						<span className="absolute top-1 -left-[27px] h-3 w-3 rounded-full bg-(--mineral)" />
-						<p className="text-xs font-semibold tracking-wide text-(--mineral-deep)">
+						<span className="absolute top-1.5 -left-[28px] size-[7px] rotate-45 bg-(--champagne)" />
+						<p className="text-xs font-semibold text-(--mineral-deep)">
 							{item.time}
 						</p>
 						<p className="mt-0.5 text-sm font-semibold text-(--carbon)">

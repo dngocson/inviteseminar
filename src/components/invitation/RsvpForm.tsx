@@ -1,4 +1,5 @@
 import { useForm } from "@tanstack/react-form";
+import { CircleCheck, LoaderCircle, Pencil, Send } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Button } from "#/components/ui/button";
@@ -6,13 +7,17 @@ import {
 	Field,
 	FieldContent,
 	FieldError,
+	FieldGroup,
 	FieldLabel,
+	FieldLegend,
+	FieldSet,
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
@@ -70,8 +75,13 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 				initial={{ opacity: 0, scale: 0.97 }}
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-				className="lab-card rounded-3xl p-6 text-center"
+				className="lab-card p-6 text-center"
 			>
+				<CircleCheck
+					className="mx-auto mb-4 size-10 text-primary"
+					strokeWidth={1.5}
+					aria-hidden="true"
+				/>
 				<h3 className="display-title text-xl font-semibold text-(--carbon)">
 					{m.rsvp_success_title()}
 				</h3>
@@ -82,9 +92,10 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 				</p>
 				<Button
 					variant="outline"
-					className="mt-4 min-h-11 rounded-full"
+					className="mt-4 min-h-11"
 					onClick={() => mutation.reset()}
 				>
+					<Pencil data-icon="inline-start" />
 					{m.rsvp_update()}
 				</Button>
 			</motion.div>
@@ -101,74 +112,79 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 
 	return (
 		<form
-			className="lab-card space-y-5 rounded-3xl p-6"
+			className="flex flex-col gap-5"
 			onSubmit={(e) => {
 				e.preventDefault();
 				e.stopPropagation();
 				form.handleSubmit();
 			}}
 		>
-			{isEditing && (
-				<p className="text-xs text-(--carbon-soft)">{m.rsvp_edit_hint()}</p>
-			)}
-
-			<form.Field
-				name="responderName"
-				validators={{
-					onChange: ({ value }) =>
-						value.trim().length === 0
-							? m.rsvp_validation_name_required()
-							: undefined,
-				}}
-			>
-				{(field) => (
-					<Field data-invalid={field.state.meta.errors.length > 0}>
-						<FieldContent>
-							<FieldLabel htmlFor={field.name}>
-								{m.rsvp_name_label()}
-							</FieldLabel>
-							<Input
-								id={field.name}
-								name={field.name}
-								value={field.state.value}
-								placeholder={m.rsvp_name_placeholder()}
-								onBlur={field.handleBlur}
-								onChange={(e) => field.handleChange(e.target.value)}
-							/>
-							<FieldError
-								errors={field.state.meta.errors.map((message) => ({ message }))}
-							/>
-						</FieldContent>
-					</Field>
+			<FieldGroup>
+				{isEditing && (
+					<p className="text-xs text-(--carbon-soft)">{m.rsvp_edit_hint()}</p>
 				)}
-			</form.Field>
 
-			<form.Field name="message">
-				{(field) => (
-					<Field>
-						<FieldContent>
-							<FieldLabel htmlFor={field.name}>
-								{m.rsvp_message_label()}
-							</FieldLabel>
-							<Textarea
-								id={field.name}
-								name={field.name}
-								value={field.state.value}
-								placeholder={m.rsvp_message_placeholder()}
-								onBlur={field.handleBlur}
-								onChange={(e) => field.handleChange(e.target.value)}
-								rows={3}
-							/>
-						</FieldContent>
-					</Field>
-				)}
-			</form.Field>
+				<form.Field
+					name="responderName"
+					validators={{
+						onChange: ({ value }) =>
+							value.trim().length === 0
+								? m.rsvp_validation_name_required()
+								: undefined,
+					}}
+				>
+					{(field) => (
+						<Field data-invalid={field.state.meta.errors.length > 0}>
+							<FieldContent>
+								<FieldLabel htmlFor={field.name}>
+									{m.rsvp_name_label()}
+								</FieldLabel>
+								<Input
+									id={field.name}
+									aria-invalid={field.state.meta.errors.length > 0}
+									name={field.name}
+									value={field.state.value}
+									placeholder={m.rsvp_name_placeholder()}
+									onBlur={field.handleBlur}
+									onChange={(e) => field.handleChange(e.target.value)}
+								/>
+								<FieldError
+									errors={field.state.meta.errors.map((message) => ({
+										message,
+									}))}
+								/>
+							</FieldContent>
+						</Field>
+					)}
+				</form.Field>
 
-			<form.Field name="attending">
-				{(field) => (
-					<Field>
-						<FieldContent>
-							<FieldLabel>{m.rsvp_attending_label()}</FieldLabel>
+				<form.Field name="message">
+					{(field) => (
+						<Field>
+							<FieldContent>
+								<FieldLabel htmlFor={field.name}>
+									{m.rsvp_message_label()}
+								</FieldLabel>
+								<Textarea
+									id={field.name}
+									name={field.name}
+									value={field.state.value}
+									placeholder={m.rsvp_message_placeholder()}
+									onBlur={field.handleBlur}
+									onChange={(e) => field.handleChange(e.target.value)}
+									rows={3}
+								/>
+							</FieldContent>
+						</Field>
+					)}
+				</form.Field>
+
+				<form.Field name="attending">
+					{(field) => (
+						<FieldSet>
+							<FieldLegend variant="label">
+								{m.rsvp_attending_label()}
+							</FieldLegend>
 							<RadioGroup
 								value={field.state.value}
 								onValueChange={(value) =>
@@ -176,78 +192,84 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 								}
 								className="gap-2"
 							>
-								<div className="flex min-h-11 items-center gap-3 rounded-2xl border border-(--lab-line) px-4 text-sm font-medium text-(--carbon)">
+								<div className="flex min-h-12 items-center gap-3 rounded-md border border-(--lab-line) px-4 py-2 text-sm font-medium text-(--carbon) has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-accent">
 									<RadioGroupItem value="yes" id="attending-yes" />
 									<label htmlFor="attending-yes">
 										{m.rsvp_attending_yes()}
 									</label>
 								</div>
-								<div className="flex min-h-11 items-center gap-3 rounded-2xl border border-(--lab-line) px-4 text-sm font-medium text-(--carbon)">
+								<div className="flex min-h-12 items-center gap-3 rounded-md border border-(--lab-line) px-4 py-2 text-sm font-medium text-(--carbon) has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-accent">
 									<RadioGroupItem value="no" id="attending-no" />
 									<label htmlFor="attending-no">{m.rsvp_attending_no()}</label>
 								</div>
 							</RadioGroup>
-						</FieldContent>
-					</Field>
-				)}
-			</form.Field>
+						</FieldSet>
+					)}
+				</form.Field>
 
-			<form.Subscribe selector={(state) => state.values.attending}>
-				{(attending) =>
-					attending === "yes" && (
-						<form.Field name="attendeeCount">
-							{(field) => (
-								<Field>
-									<FieldContent>
-										<FieldLabel htmlFor={field.name}>
-											{m.rsvp_count_label()}
-										</FieldLabel>
-										<Select
-											value={String(field.state.value)}
-											onValueChange={(value) =>
-												field.handleChange(Number(value))
-											}
-										>
-											<SelectTrigger
-												id={field.name}
-												className="w-full min-h-11"
+				<form.Subscribe selector={(state) => state.values.attending}>
+					{(attending) =>
+						attending === "yes" && (
+							<form.Field name="attendeeCount">
+								{(field) => (
+									<Field>
+										<FieldContent>
+											<FieldLabel htmlFor={field.name}>
+												{m.rsvp_count_label()}
+											</FieldLabel>
+											<Select
+												value={String(field.state.value)}
+												onValueChange={(value) =>
+													field.handleChange(Number(value))
+												}
 											>
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												{Array.from(
-													{ length: invitation.maxAttendees },
-													(_, i) => i + 1,
-												).map((total) => (
-													<SelectItem key={total} value={String(total)}>
-														{total === 1
-															? m.rsvp_count_option_self()
-															: m.rsvp_count_option({ count: total - 1 })}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									</FieldContent>
-								</Field>
-							)}
-						</form.Field>
-					)
-				}
-			</form.Subscribe>
+												<SelectTrigger
+													id={field.name}
+													className="w-full min-h-11"
+												>
+													<SelectValue />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectGroup>
+														{Array.from(
+															{ length: invitation.maxAttendees },
+															(_, i) => i + 1,
+														).map((total) => (
+															<SelectItem key={total} value={String(total)}>
+																{total === 1
+																	? m.rsvp_count_option_self()
+																	: m.rsvp_count_option({ count: total - 1 })}
+															</SelectItem>
+														))}
+													</SelectGroup>
+												</SelectContent>
+											</Select>
+										</FieldContent>
+									</Field>
+								)}
+							</form.Field>
+						)
+					}
+				</form.Subscribe>
 
-			{errorMessage && (
-				<p role="alert" className="text-sm font-medium text-(--coral)">
-					{errorMessage}
-				</p>
-			)}
-
+				{errorMessage && (
+					<p role="alert" className="text-sm font-medium text-(--coral)">
+						{errorMessage}
+					</p>
+				)}
+			</FieldGroup>
 			<form.Subscribe selector={(state) => ({ canSubmit: state.canSubmit })}>
 				{({ canSubmit }) => (
 					<Button
 						type="submit"
 						disabled={!canSubmit || mutation.isPending}
-						className="min-h-11 w-full rounded-full bg-(--mineral) text-white hover:bg-(--mineral-deep)"
+						className="min-h-12 w-full"
 					>
+						{mutation.isPending ? (
+							<LoaderCircle data-icon="inline-start" className="animate-spin" />
+						) : (
+							<Send data-icon="inline-start" />
+						)}
 						{mutation.isPending
 							? m.rsvp_submitting()
 							: isEditing

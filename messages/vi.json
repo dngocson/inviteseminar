@@ -75,6 +75,11 @@
 
   "admin_logout": "Đăng xuất",
   "admin_dashboard_title": "Quản lý khách mời",
+  "admin_workspace_label": "Quản trị sự kiện",
+  "admin_open_event": "Xem trang sự kiện",
+  "admin_guest_list_title": "Danh sách khách mời",
+  "admin_results_count": "{count} trên {total} khách mời",
+  "admin_no_results": "Không có khách mời phù hợp với tìm kiếm hoặc bộ lọc.",
 
   "admin_stats_total": "Tổng khách mời",
   "admin_stats_responded": "Đã phản hồi",
