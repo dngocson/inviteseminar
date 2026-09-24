@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as McpRouteImport } from './routes/mcp'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as ApiRsvpRouteImport } from './routes/api/rsvp'
@@ -27,11 +26,6 @@ import { Route as ApiAdminGuestsIdRegenerateRouteImport } from './routes/api/adm
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -98,7 +92,6 @@ const ApiAdminGuestsIdRegenerateRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/mcp': typeof McpRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/rsvp': typeof ApiRsvpRoute
   '/admin/': typeof AdminIndexRoute
@@ -114,7 +107,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/mcp': typeof McpRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/rsvp': typeof ApiRsvpRoute
   '/admin': typeof AdminIndexRoute
@@ -131,7 +123,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/mcp': typeof McpRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/rsvp': typeof ApiRsvpRoute
   '/admin/': typeof AdminIndexRoute
@@ -149,7 +140,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/mcp'
     | '/admin/login'
     | '/api/rsvp'
     | '/admin/'
@@ -165,7 +155,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/mcp'
     | '/admin/login'
     | '/api/rsvp'
     | '/admin'
@@ -181,7 +170,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/mcp'
     | '/admin/login'
     | '/api/rsvp'
     | '/admin/'
@@ -198,7 +186,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  McpRoute: typeof McpRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ApiRsvpRoute: typeof ApiRsvpRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -218,13 +205,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -339,7 +319,6 @@ const ApiAdminGuestsRouteWithChildren = ApiAdminGuestsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  McpRoute: McpRoute,
   AdminLoginRoute: AdminLoginRoute,
   ApiRsvpRoute: ApiRsvpRoute,
   AdminIndexRoute: AdminIndexRoute,

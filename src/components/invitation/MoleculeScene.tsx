@@ -1,11 +1,15 @@
 import type { ReactNode } from "react";
 import { Component, lazy, Suspense, useEffect, useRef, useState } from "react";
 
-const MoleculeCanvas = lazy(() =>
-	import("#/components/invitation/MoleculeCanvas").then((mod) => ({
-		default: mod.MoleculeCanvas,
-	})),
-);
+// The canvas only ever mounts client-side (see `mounted` below), so stub it
+// out of the SSR build entirely to keep three.js out of the server function.
+const MoleculeCanvas = import.meta.env.SSR
+	? () => null
+	: lazy(() =>
+			import("#/components/invitation/MoleculeCanvas").then((mod) => ({
+				default: mod.MoleculeCanvas,
+			})),
+		);
 
 function supportsWebGL(): boolean {
 	try {
