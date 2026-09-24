@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
+import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 const config = defineConfig({
@@ -60,6 +61,8 @@ const config = defineConfig({
 		}),
 		tailwindcss(),
 		tanstackStart(),
+		// Packages the server for the host it builds on (auto-detects Vercel).
+		nitro(),
 		viteReact(),
 		babel({ presets: [reactCompilerPreset()] }),
 	],
