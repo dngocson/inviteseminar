@@ -30,15 +30,41 @@ function Home() {
 	useLocaleSync(locale);
 
 	if (!code) {
-		return (
-			<InvitationStatusScreen
-				title={m.invite_missing_title()}
-				body={m.invite_missing_body()}
-			/>
-		);
+		return <EventContent locale={locale} />;
 	}
 
 	return <InvitationContent code={code} locale={locale} />;
+}
+
+/** Public view for links without an invite code: the event itself, minus the RSVP. */
+function EventContent({ locale }: { locale: "vi" | "en" }) {
+	const organizer = localized(eventConfig.organizer, locale);
+
+	return (
+		<InvitationShell locale={locale}>
+			<HeroSection
+				seminarName={localized(eventConfig.seminarName, locale)}
+				organizer={organizer}
+			/>
+			<EventDetails locale={locale} />
+			<OutroSection organizer={organizer} />
+		</InvitationShell>
+	);
+}
+
+function EventDetails({ locale }: { locale: "vi" | "en" }) {
+	return (
+		<>
+			<ScheduleSection
+				startsAt={eventConfig.startsAt}
+				venueName={localized(eventConfig.venue.name, locale)}
+				venueAddress={localized(eventConfig.venue.address, locale)}
+				mapUrl={eventConfig.venue.mapUrl}
+				locale={locale}
+			/>
+			<TimelineSection items={[...eventConfig.timeline]} locale={locale} />
+		</>
+	);
 }
 
 function InvitationContent({
@@ -75,14 +101,7 @@ function InvitationContent({
 				seminarName={seminarName}
 				organizer={organizer}
 			/>
-			<ScheduleSection
-				startsAt={eventConfig.startsAt}
-				venueName={localized(eventConfig.venue.name, locale)}
-				venueAddress={localized(eventConfig.venue.address, locale)}
-				mapUrl={eventConfig.venue.mapUrl}
-				locale={locale}
-			/>
-			<TimelineSection items={[...eventConfig.timeline]} locale={locale} />
+			<EventDetails locale={locale} />
 			<RsvpSection code={code} invitation={invitation} />
 			<OutroSection organizer={organizer} />
 		</InvitationShell>

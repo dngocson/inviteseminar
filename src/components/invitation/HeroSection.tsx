@@ -4,7 +4,8 @@ import { MoleculeScene } from "#/components/invitation/MoleculeScene";
 import { m } from "#/paraglide/messages";
 
 interface HeroSectionProps {
-	fullName: string;
+	/** Omitted on the public (no invite code) page: the event name becomes the heading. */
+	fullName?: string;
 	seminarName: string;
 	organizer: string;
 }
@@ -32,12 +33,20 @@ export function HeroSection({
 				transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
 			>
 				<p className="lab-kicker">{m.hero_kicker()}</p>
-				<h1 className="display-title mt-3 text-3xl leading-tight font-semibold text-(--carbon)">
-					{m.hero_greeting({ fullName })}
-				</h1>
-				<p className="display-title mt-2 text-lg text-(--mineral-deep)">
-					{seminarName}
-				</p>
+				{fullName ? (
+					<>
+						<h1 className="display-title mt-3 text-3xl leading-tight font-semibold text-(--carbon)">
+							{m.hero_greeting({ fullName })}
+						</h1>
+						<p className="display-title mt-2 text-lg text-(--mineral-deep)">
+							{seminarName}
+						</p>
+					</>
+				) : (
+					<h1 className="display-title mt-3 text-3xl leading-tight font-semibold text-(--carbon)">
+						{seminarName}
+					</h1>
+				)}
 				<p className="mt-3 max-w-xs text-sm leading-relaxed text-(--carbon-soft)">
 					{m.hero_subtitle()}
 				</p>
