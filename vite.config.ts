@@ -8,6 +8,38 @@ import { defineConfig } from "vite";
 
 const config = defineConfig({
 	resolve: { tsconfigPaths: true },
+	// Vite minifies the client bundle by default but leaves server (SSR)
+	// output unminified; minify both so the whole `dist` ships compact.
+	build: {
+		minify: true,
+		cssMinify: true,
+		sourcemap: false,
+		reportCompressedSize: false,
+	},
+	environments: {
+		client: {
+			build: {
+				rolldownOptions: {
+					output: {
+						// Strip every comment (incl. license banners) and drop
+						// console/debugger from the browser bundle. Server keeps its
+						// console output so production errors still reach the logs.
+						comments: false,
+						minify: {
+							compress: { dropConsole: true, dropDebugger: true },
+							mangle: true,
+						},
+					},
+				},
+			},
+		},
+		ssr: {
+			build: {
+				minify: true,
+				rolldownOptions: { output: { comments: false } },
+			},
+		},
+	},
 	plugins: [
 		devtools({
 			// The browser<->terminal console relay re-prints its whole
