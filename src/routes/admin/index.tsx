@@ -85,6 +85,8 @@ function AdminDashboard() {
 					<GuestDataView guests={guestsQuery.data} />
 				)}
 			</section>
+			<div className="w-screen h-screen">
+			</div>
 		</div>
 	);
 }

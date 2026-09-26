@@ -15,93 +15,120 @@ export interface TimelineItem {
  */
 export const eventConfig = {
 	seminarName: {
-		vi: "Hội thảo Nguyên liệu & Công nghệ Mỹ phẩm 2026",
-		en: "Cosmetic Ingredients & Formulation Technology Seminar 2026",
+		en: `
+    <span class="block text-[1.25rem] sm:text-[2.5rem]">Beyond Prebiotics:</span>
+    <span class="block ">Multifunctional Solutions</span>
+    <span class="block text-[1.25rem] sm:text-[2.5rem]">for Today's Cosmetics</span>
+  `,
+		vi: `
+    <span class="block text-[1.25rem] sm:text-[2.5rem]">Vượt xa hơn cả Prebiotics:</span>
+    <span class="block ">Những giải pháp đa chức năng</span>
+    <span class="block text-[1.25rem] sm:text-[2.5rem]">cho mỹ phẩm ngày nay</span>
+  `,
 	} satisfies Bilingual,
 
 	organizer: {
-		vi: "Công ty TNHH Hóa chất Nguyên liệu Việt",
-		en: "Viet Ingredient Chemicals Co., Ltd.",
+		vi: "Công ty TNHH Dermatech Việt Nam",
+		en: "DERMATECH VIET NAM COMPANY LIMITED",
 	} satisfies Bilingual,
 
 	// ISO 8601 with the Asia/Ho_Chi_Minh offset baked in, so the countdown and
 	// schedule are correct regardless of the visitor's local timezone.
-	startsAt: "2026-11-14T08:30:00+07:00",
+	startsAt: "2026-11-14T08:00:00+07:00",
 	endsAt: "2026-11-14T17:00:00+07:00",
 	timezone: "Asia/Ho_Chi_Minh",
 
 	venue: {
 		name: {
-			vi: "Trung tâm Hội nghị White Palace",
-			en: "White Palace Convention Center",
+			vi: "Le Méridien Saigon",
+			en: "Le Méridien Saigon",
 		} satisfies Bilingual,
 		address: {
-			vi: "194 Hoàng Văn Thụ, Phường Hai Bà Trưng, TP. Hồ Chí Minh",
-			en: "194 Hoang Van Thu, Hai Ba Trung Ward, Ho Chi Minh City",
+			vi: "3C Tôn Đức Thắng, Quận 1, TP. Hồ Chí Minh",
+			en: "3C Ton Duc Thang Street, District 1, Ho Chi Minh City",
 		} satisfies Bilingual,
-		mapUrl: "https://maps.google.com/?q=White+Palace+194+Hoang+Van+Thu",
+		mapUrl: "https://maps.app.goo.gl/XumDRVtgCZ95m8ox5",
 	},
 
 	timeline: [
 		{
+			time: "08:00",
+			title: {
+				vi: "Check-in & Ổn định",
+				en: "Check-in & Seating",
+			},
+			description: {
+				vi: "Đón khách, check-in và ổn định chỗ ngồi trước khi chương trình bắt đầu.",
+				en: "Guest check-in and seating before the program begins.",
+			},
+		},
+		{
 			time: "08:30",
 			title: {
-				vi: "Đón khách & Trưng bày nguyên liệu",
-				en: "Guest check-in & ingredient showcase",
+				vi: "Khai mạc",
+				en: "Opening",
 			},
 			description: {
-				vi: "Tham quan gian trưng bày mẫu nguyên liệu hoạt chất và bán thành phẩm mới nhất.",
-				en: "Browse the showcase of the latest active ingredient samples and semi-finished formulas.",
+				vi: "Phát biểu khai mạc và giới thiệu chương trình.",
+				en: "Opening remarks and an introduction to the program.",
 			},
 		},
 		{
-			time: "09:00",
-			title: { vi: "Khai mạc & Giới thiệu", en: "Opening & Introduction" },
-			description: {
-				vi: "Phát biểu khai mạc và giới thiệu định hướng nghiên cứu nguyên liệu mỹ phẩm 2026.",
-				en: "Opening remarks and an overview of 2026 cosmetic ingredient research directions.",
-			},
-		},
-		{
-			time: "09:45",
+			time: "08:45",
 			title: {
-				vi: "Xu hướng nguyên liệu hoạt chất",
-				en: "Active ingredient trends",
+				vi: "Prebiotic: Ngôn ngữ của hệ vi sinh trên da",
+				en: "Prebiotic: The Language of the Skin Microbiome",
 			},
 			description: {
-				vi: "Cập nhật các hoạt chất chống lão hóa, phục hồi da và công nghệ vi bọc (microencapsulation).",
-				en: "Updates on anti-aging actives, skin-barrier repair compounds, and microencapsulation technology.",
+				vi: "Chuyên đề về vai trò của prebiotic và mối liên hệ với hệ vi sinh trên da.\n Diễn giả: Tiến sĩ Sébastien Kerverdo – Giám đốc Kinh doanh Sweetch Holding.",
+				en: "A session exploring the role of prebiotics and their relationship with the skin microbiome.\n Speaker: Dr. Sébastien Kerverdo – Sales Director, Sweetch Holding.",
+			},
+		},
+		{
+			time: "10:30",
+			title: {
+				vi: "Giải lao",
+				en: "Break Time",
+			},
+			description: {
+				vi: "Thời gian nghỉ giải lao và giao lưu cùng khách mời.",
+				en: "A short break and networking with guests.",
 			},
 		},
 		{
 			time: "10:45",
-			title: { vi: "Giải lao & Kết nối", en: "Coffee break & networking" },
-			description: {
-				vi: "Giao lưu cùng đội ngũ chuyên gia R&D và đối tác cung ứng.",
-				en: "Connect with our R&D specialists and supply partners.",
-			},
-		},
-		{
-			time: "11:15",
-			title: { vi: "Thực hành công thức mẫu", en: "Live formulation demo" },
-			description: {
-				vi: "Trình diễn phối trộn công thức serum và kem dưỡng với nguyên liệu mới.",
-				en: "Live demonstration of serum and cream formulation using the new ingredient line.",
-			},
-		},
-		{
-			time: "12:00",
 			title: {
-				vi: "Tổng kết & Tiệc trưa thân mật",
-				en: "Closing remarks & lunch",
+				vi: "Vượt xa hơn cả Prebiotics – Những giải pháp đa chức năng cho mỹ phẩm ngày nay",
+				en: "Beyond Prebiotics – Multifunctional Solutions for Today's Cosmetics",
 			},
 			description: {
-				vi: "Tổng kết chương trình và dùng bữa trưa thân mật cùng khách mời.",
-				en: "Program wrap-up followed by a casual lunch with guests.",
+				vi: "Khám phá những giải pháp đa chức năng, vượt xa vai trò truyền thống của prebiotics trong các ứng dụng mỹ phẩm hiện đại.\nDiễn giả: Tiến sĩ Sébastien Kerverdo – Giám đốc Kinh doanh Sweetch Holding.",
+				en: "Explore multifunctional solutions that go beyond the traditional role of prebiotics in modern cosmetic applications.\nSpeaker: Dr. Sébastien Kerverdo – Sales Director, Sweetch Holding.",
+			},
+		},
+		{
+			time: "11:50",
+			title: {
+				vi: "Giao lưu & Bế mạc",
+				en: "Networking & Closing",
+			},
+			description: {
+				vi: "Giao lưu, trao đổi cùng diễn giả và khách mời, sau đó bế mạc chương trình.",
+				en: "Networking and discussion with the speaker and guests, followed by the closing of the program.",
+			},
+		},
+		{
+			time: "12:15",
+			title: {
+				vi: "Tiệc trưa thân mật",
+				en: "Casual Lunch",
+			},
+			description: {
+				vi: "Dùng bữa trưa thân mật và tiếp tục giao lưu cùng khách mời.",
+				en: "Enjoy a casual lunch and continue networking with guests.",
 			},
 		},
 	] as TimelineItem[],
-
 	defaultMaxAttendees: 5,
 } as const;
 

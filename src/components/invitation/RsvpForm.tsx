@@ -192,16 +192,20 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 								}
 								className="gap-2"
 							>
-								<div className="flex min-h-12 items-center gap-3 rounded-md border border-(--lab-line) px-4 py-2 text-sm font-medium text-(--carbon) has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-accent">
+								<label
+									htmlFor="attending-yes"
+									className="flex min-h-12 cursor-pointer items-center gap-3 rounded-md border border-(--lab-line) px-4 py-2 text-sm font-medium text-(--carbon) transition-colors has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-accent"
+								>
 									<RadioGroupItem value="yes" id="attending-yes" />
-									<label htmlFor="attending-yes">
-										{m.rsvp_attending_yes()}
-									</label>
-								</div>
-								<div className="flex min-h-12 items-center gap-3 rounded-md border border-(--lab-line) px-4 py-2 text-sm font-medium text-(--carbon) has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-accent">
+									<span>{m.rsvp_attending_yes()}</span>
+								</label>
+								<label
+									htmlFor="attending-no"
+									className="flex min-h-12 cursor-pointer items-center gap-3 rounded-md border border-(--lab-line) px-4 py-2 text-sm font-medium text-(--carbon) transition-colors has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-accent"
+								>
 									<RadioGroupItem value="no" id="attending-no" />
-									<label htmlFor="attending-no">{m.rsvp_attending_no()}</label>
-								</div>
+									<span>{m.rsvp_attending_no()}</span>
+								</label>
 							</RadioGroup>
 						</FieldSet>
 					)}

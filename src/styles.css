@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
-@import 'tailwindcss';
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
 @plugin '@tailwindcss/typography';
 
-@import 'tw-animate-css';
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -78,7 +78,7 @@
 }
 
 @theme inline {
-  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -140,7 +140,7 @@ code {
 }
 
 .display-title {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: "Fraunces", Georgia, serif;
 }
 
 .rise-in {
@@ -199,7 +199,6 @@ code {
   letter-spacing: 0;
   font-weight: 600;
   font-size: 0.75rem;
-  color: var(--mineral-deep);
 }
 
 .invitation-shell {
@@ -299,7 +298,7 @@ code {
 
 @media (max-width: 639px) {
   .invitation-hero {
-    padding-top: 14rem;
+    padding-top: 5rem;
   }
 
   .hero-molecule {
@@ -408,19 +407,19 @@ code {
   background: linear-gradient(115deg, #e6eee8, var(--background) 45%, #ffffff);
 }
 
-.choice-option:has([data-state='checked']) {
+.choice-option:has([data-state="checked"]) {
   border-color: var(--primary);
   background: var(--accent);
 }
 
-.admin-theme [data-slot='input'],
-.admin-theme [data-slot='select-trigger'],
-.lab-theme [data-slot='input'] {
+.admin-theme [data-slot="input"],
+.admin-theme [data-slot="select-trigger"],
+.lab-theme [data-slot="input"] {
   min-height: 2.75rem;
 }
 
-.admin-theme [data-slot='dialog-overlay'],
-.admin-theme [data-slot='alert-dialog-overlay'] {
+.admin-theme [data-slot="dialog-overlay"],
+.admin-theme [data-slot="alert-dialog-overlay"] {
   background: rgb(13 34 27 / 42%);
   backdrop-filter: blur(4px);
 }

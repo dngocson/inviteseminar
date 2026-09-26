@@ -42,7 +42,7 @@ export function TimelineSection({
 						<p className="mt-0.5 text-sm font-semibold text-(--carbon)">
 							{localized(item.title, locale)}
 						</p>
-						<p className="mt-0.5 text-xs leading-relaxed text-(--carbon-soft)">
+						<p className="mt-0.5 whitespace-pre-line text-xs leading-relaxed text-(--carbon-soft)">
 							{localized(item.description, locale)}
 						</p>
 					</motion.li>
