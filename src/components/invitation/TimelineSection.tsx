@@ -35,8 +35,8 @@ export function TimelineSection({
 							ease: [0.16, 1, 0.3, 1],
 						}}
 					>
-						<span className="absolute top-1.5 -left-[28px] size-[7px] rotate-45 bg-(--champagne)" />
-						<p className="text-xs font-semibold text-(--mineral-deep)">
+						<span className="absolute top-1.5 -left-[28px] size-[7px] rotate-45 bg-(--carbon)" />
+						<p className="text-xs font-semibold text-(--carbon-soft)">
 							{item.time}
 						</p>
 						<p className="mt-0.5 text-sm font-semibold text-(--carbon)">

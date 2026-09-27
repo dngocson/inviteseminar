@@ -86,15 +86,6 @@ export function HeroSection({
 					>
 						{m.hero_kicker()}
 					</motion.p>
-
-					<motion.h1
-						variants={item}
-						className="display-title hero-title mt-3 bg-gradient-to-r from-[#fff9e8] via-[#ffe08a] to-[#f4b942] bg-clip-text text-center text-transparent"
-						dangerouslySetInnerHTML={{
-							__html: seminarName,
-						}}
-					></motion.h1>
-
 					{fullName && (
 						<motion.p
 							variants={item}
@@ -103,6 +94,19 @@ export function HeroSection({
 							{m.hero_greeting({ fullName })}
 						</motion.p>
 					)}
+					<motion.p
+						variants={item}
+						className="display-title mt-5 text-center text-sm text-[#dfe3f3] whitespace-nowrap"
+					>
+						{m.hero_title()}
+					</motion.p>
+					<motion.h1
+						variants={item}
+						className="display-title hero-title mt-3 bg-gradient-to-r from-[#fff9e8] via-[#ffe08a] to-[#f4b942] bg-clip-text text-center text-transparent"
+						dangerouslySetInnerHTML={{
+							__html: seminarName,
+						}}
+					></motion.h1>
 
 					<motion.div
 						variants={item}

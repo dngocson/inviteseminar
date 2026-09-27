@@ -18,8 +18,9 @@
   "invite_loading": "Đang tải lời mời...",
 
   "hero_kicker": "Trân trọng kính mời",
-  "hero_greeting": "Kính mời {fullName}",
-  "hero_subtitle": "Cùng khám phá những đột phá mới nhất trong công nghệ nguyên liệu và công thức mỹ phẩm",
+  "hero_greeting": "{fullName}",
+  "hero_title": "Đến tham dự hội thảo",
+  "hero_subtitle": "Cùng khám phá những giải pháp chăm sóc và cân bằng hệ vi sinh trên da.",
 
   "schedule_kicker": "Thời gian & Địa điểm",
   "schedule_title": "Thông tin sự kiện",
@@ -61,8 +62,8 @@
   "rsvp_validation_name_required": "Vui lòng nhập họ và tên",
   "rsvp_validation_count_required": "Vui lòng chọn số người tham dự",
 
-  "outro_title": "Rất mong được gặp bạn",
-  "outro_body": "Sự hiện diện của bạn là niềm vinh hạnh lớn đối với chúng tôi. Hẹn gặp bạn tại sự kiện!",
+  "outro_title": "Rất hân hạnh được gặp Quý đại biểu tại Hội thảo",
+  "outro_body": "Sự hiện diện của Quý đại biểu là niềm vinh hạnh lớn đối với chúng tôi.",
   "outro_signature": "Trân trọng,",
 
   "admin_login_title": "Đăng nhập quản trị",

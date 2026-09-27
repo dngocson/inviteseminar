@@ -89,7 +89,7 @@ export function ScheduleSection({
 					href={mapUrl}
 					target="_blank"
 					rel="noreferrer"
-					className="invitation-cta mt-7 inline-flex min-h-12 items-center justify-center gap-3 rounded-md bg-(--mineral-deep) px-6 text-sm font-semibold text-white transition-colors hover:bg-(--carbon)"
+					className="invitation-cta mt-7 inline-flex min-h-12 items-center justify-center gap-3 rounded-md  px-6 text-sm font-semibold text-white transition-colors bg-[#d9a75c]  hover:bg-[#c58c37]"
 				>
 					{m.schedule_map_cta()}
 					<ArrowUpRight className="size-4" aria-hidden="true" />

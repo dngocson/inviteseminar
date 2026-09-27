@@ -16,14 +16,14 @@ export interface TimelineItem {
 export const eventConfig = {
 	seminarName: {
 		en: `
-    <span class="block text-[1.25rem] sm:text-[2.5rem]">Beyond Prebiotics:</span>
-    <span class="block ">Multifunctional Solutions</span>
-    <span class="block text-[1.25rem] sm:text-[2.5rem]">for Today's Cosmetics</span>
+    <span class="block text-[1rem] sm:text-[2rem]">Beyond Prebiotics:</span>
+    <span class="block whitespace-nowrap">Multifunctional Solutions</span>
+    <span class="block text-[1rem] sm:text-[2rem]">for Modern Cosmetics</span>
   `,
 		vi: `
-    <span class="block text-[1.25rem] sm:text-[2.5rem]">Vượt xa hơn cả Prebiotics:</span>
-    <span class="block ">Những giải pháp đa chức năng</span>
-    <span class="block text-[1.25rem] sm:text-[2.5rem]">cho mỹ phẩm ngày nay</span>
+    <span class="block text-[1rem] sm:text-[2rem]">Không chỉ là Prebiotics:</span>
+    <span class="block whitespace-nowrap">Từ một đến muôn vai</span>
+    <span class="block text-[1rem] sm:text-[2rem]">cho mỹ phẩm hiện đại</span>
   `,
 	} satisfies Bilingual,
 
@@ -34,8 +34,8 @@ export const eventConfig = {
 
 	// ISO 8601 with the Asia/Ho_Chi_Minh offset baked in, so the countdown and
 	// schedule are correct regardless of the visitor's local timezone.
-	startsAt: "2026-11-14T08:00:00+07:00",
-	endsAt: "2026-11-14T17:00:00+07:00",
+	startsAt: "2026-10-28T08:00:00+07:00",
+	endsAt: "2026-10-28T17:00:00+07:00",
 	timezone: "Asia/Ho_Chi_Minh",
 
 	venue: {
@@ -98,7 +98,7 @@ export const eventConfig = {
 		{
 			time: "10:45",
 			title: {
-				vi: "Vượt xa hơn cả Prebiotics – Những giải pháp đa chức năng cho mỹ phẩm ngày nay",
+				vi: "Không chỉ là Prebiotics – Những giải pháp đa chức năng cho mỹ phẩm ngày nay",
 				en: "Beyond Prebiotics – Multifunctional Solutions for Today's Cosmetics",
 			},
 			description: {

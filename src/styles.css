@@ -171,7 +171,7 @@ code {
   --input: #cbd6ce;
   --ring: #467b70;
   --radius: 0.5rem;
-  --carbon: #172b28;
+  --carbon: oklch(28.3% 0.141 291.089);
   --carbon-soft: #56645f;
   --mineral: #467b70;
   --mineral-deep: #174f46;
@@ -183,6 +183,7 @@ code {
   --lab-surface-strong: rgba(255, 255, 255, 0.97);
   --lab-line: rgba(23, 79, 70, 0.16);
   --lab-glint: rgba(255, 255, 255, 0.75);
+  --orange-timeline: oklch(14.5% 0 none);
 
   background: var(--paper);
   color: var(--carbon);
@@ -238,7 +239,7 @@ code {
 }
 
 .hero-title {
-  font-size: 3rem;
+  font-size: 3.25rem;
   font-weight: 500;
   line-height: 1.15;
   text-wrap: balance;
@@ -263,10 +264,9 @@ code {
 }
 
 .invitation-outro {
-  --carbon: #f7f9f7;
+  --carbon: #252446;
   --carbon-soft: #c9d8d0;
   border-top: 2px solid var(--champagne);
-  background: #173f36;
 }
 
 .lab-theme :focus-visible {
@@ -306,7 +306,7 @@ code {
   }
 
   .hero-title {
-    font-size: 2rem;
+    font-size: 1.75rem;
     line-height: 1.2;
   }
 }

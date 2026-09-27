@@ -67,7 +67,7 @@ export function Countdown({ startsAt }: { startsAt: string }) {
 		>
 			{units.map((unit) => (
 				<div key={unit.label} className="min-w-0 px-1 py-2 text-center">
-					<div className="display-title text-3xl font-medium tabular-nums text-(--mineral-deep)">
+					<div className="display-title text-3xl font-medium tabular-nums text-(--carbon)">
 						{remaining ? pad(unit.value) : "--"}
 					</div>
 					<div className="mt-2 text-xs font-medium text-(--carbon-soft)">
