@@ -120,7 +120,7 @@
   "admin_regenerate_confirm_body": "Đường dẫn cũ sẽ ngừng hoạt động ngay lập tức. Hãy chắc chắn Anh/Chị sẽ gửi lại đường dẫn mới cho khách.",
   "admin_copy_link": "Sao chép đường dẫn",
   "admin_copy_link_success": "Đã sao chép đường dẫn",
-  "admin_export_csv": "Xuất CSV",
+  "admin_export_csv": "Xuất Excel",
 
   "admin_guest_name_label": "Họ và tên khách mời",
   "admin_guest_max_attendees_label": "Số người tối đa",

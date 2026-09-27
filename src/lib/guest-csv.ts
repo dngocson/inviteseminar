@@ -20,6 +20,11 @@ export interface GuestCsvRow {
  * Vietnamese where `,` is the decimal separator. A comma-delimited file
  * opens there with every field of each row crammed into column A; `;`
  * opens correctly there and Excel still reads it fine elsewhere.
+ *
+ * Do NOT add a `sep=` hint line here — combined with the UTF-8 BOM (added
+ * by the route), it makes some Excel versions fall back to reading the
+ * file as ANSI instead of UTF-8, turning Vietnamese diacritics into
+ * garbled characters.
  */
 export function buildGuestCsv(rows: GuestCsvRow[]): string {
 	const table = rows.map((row) => ({
@@ -39,5 +44,5 @@ export function buildGuestCsv(rows: GuestCsvRow[]): string {
 			: "",
 	}));
 
-	return Papa.unparse(table, { delimiter: ";" });
+	return Papa.unparse(table, { delimiter: ";", newline: "\r\n" });
 }

@@ -120,7 +120,7 @@
   "admin_regenerate_confirm_body": "The old link will stop working immediately. Make sure you resend the new link to the guest.",
   "admin_copy_link": "Copy link",
   "admin_copy_link_success": "Link copied",
-  "admin_export_csv": "Export CSV",
+  "admin_export_csv": "Export Excel",
 
   "admin_guest_name_label": "Guest full name",
   "admin_guest_max_attendees_label": "Max attendees",

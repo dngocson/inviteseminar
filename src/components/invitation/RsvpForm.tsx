@@ -267,7 +267,7 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 					<Button
 						type="submit"
 						disabled={!canSubmit || mutation.isPending}
-						className="min-h-12 w-full"
+						className="min-h-12 w-full bg-[#d9a75c]  hover:bg-[#c58c37]"
 					>
 						{mutation.isPending ? (
 							<LoaderCircle data-icon="inline-start" className="animate-spin" />

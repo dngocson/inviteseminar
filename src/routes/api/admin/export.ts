@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { ApiError, withApiErrorHandling } from "#/lib/api-response";
 import { requireAdminUser } from "#/lib/auth";
-import { buildGuestCsv } from "#/lib/guest-csv";
+import { buildGuestXlsx } from "#/lib/guest-xlsx";
 import { getSupabaseAdminClient } from "#/lib/supabase/admin";
 
 const GUEST_EXPORT_SELECT =
@@ -41,14 +41,13 @@ export const Route = createFileRoute("/api/admin/export")({
 					};
 				});
 
-				const csv = buildGuestCsv(rows);
-				// UTF-8 BOM so Excel opens Vietnamese diacritics correctly.
-				const body = `﻿${csv}`;
+				const buffer = await buildGuestXlsx(rows);
 
-				const response = new Response(body, {
+				const response = new Response(buffer, {
 					headers: {
-						"Content-Type": "text/csv; charset=utf-8",
-						"Content-Disposition": `attachment; filename="khach-moi-seminar-${new Date().toISOString().slice(0, 10)}.csv"`,
+						"Content-Type":
+							"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+						"Content-Disposition": `attachment; filename="khach-moi-seminar-${new Date().toISOString().slice(0, 10)}.xlsx"`,
 					},
 				});
 

@@ -33,7 +33,6 @@ function AdminDashboard() {
 	const [localeKey, rerenderForLocale] = useLocaleRerender();
 	const guestsQuery = useAdminGuestsQuery(true);
 	const statsQuery = useAdminStatsQuery(true);
-
 	return (
 		<div
 			key={localeKey}

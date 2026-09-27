@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowUpRight, Atom, LogOut } from "lucide-react";
 import { Button } from "#/components/ui/button";
-import { eventConfig, localized } from "#/content/event";
 import { useLogoutMutation } from "#/hooks/use-admin-auth";
 import { m } from "#/paraglide/messages";
 import { getLocale, locales, setLocale } from "#/paraglide/runtime";
