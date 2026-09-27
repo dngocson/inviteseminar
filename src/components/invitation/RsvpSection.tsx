@@ -13,7 +13,8 @@ export function RsvpSection({
 }) {
 	return (
 		<motion.section
-			className="px-6 py-14"
+			id="rsvp"
+			className="invitation-rsvp mx-auto max-w-2xl px-6 py-14 sm:px-10 sm:py-20"
 			initial={{ opacity: 0, y: 20 }}
 			whileInView={{ opacity: 1, y: 0 }}
 			viewport={{ once: true, margin: "-80px" }}

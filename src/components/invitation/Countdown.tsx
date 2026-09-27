@@ -61,19 +61,16 @@ export function Countdown({ startsAt }: { startsAt: string }) {
 
 	return (
 		<div
-			className="grid grid-cols-4 gap-2"
+			className="grid grid-cols-4 divide-x divide-(--lab-line)"
 			aria-live="polite"
 			aria-atomic="true"
 		>
 			{units.map((unit) => (
-				<div
-					key={unit.label}
-					className="rounded-2xl border border-(--lab-line) bg-(--lab-surface-strong) px-1 py-3 text-center"
-				>
-					<div className="display-title text-xl font-semibold tabular-nums text-(--carbon)">
+				<div key={unit.label} className="min-w-0 px-1 py-2 text-center">
+					<div className="display-title text-3xl font-medium tabular-nums text-(--carbon)">
 						{remaining ? pad(unit.value) : "--"}
 					</div>
-					<div className="mt-1 text-[0.6rem] font-medium uppercase tracking-wide text-(--carbon-soft)">
+					<div className="mt-2 text-xs font-medium text-(--carbon-soft)">
 						{unit.label}
 					</div>
 				</div>

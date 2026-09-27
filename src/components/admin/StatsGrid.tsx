@@ -48,15 +48,13 @@ export function StatsGrid({ stats }: { stats: RsvpStatsDto | undefined }) {
 	];
 
 	return (
-		<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+		<div className="admin-stats grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
 			{items.map((item) => (
 				<div
 					key={item.label}
 					className={cn(
-						"rounded-2xl border bg-card p-4",
-						item.tone === "primary" && "border-primary/25 bg-accent",
-						item.tone === "destructive" &&
-							"border-destructive/25 bg-destructive/5",
+						"admin-stat min-w-0 px-5 py-6",
+						item.tone === "primary" && "bg-accent",
 					)}
 				>
 					<item.icon
@@ -66,11 +64,13 @@ export function StatsGrid({ stats }: { stats: RsvpStatsDto | undefined }) {
 							item.tone === "destructive" && "text-destructive",
 						)}
 					/>
-					<p className="mt-2 text-xs text-muted-foreground">{item.label}</p>
+					<p className="mt-4 min-h-8 text-xs leading-relaxed text-muted-foreground">
+						{item.label}
+					</p>
 					{item.value === undefined ? (
 						<Skeleton className="mt-1 h-7 w-10" />
 					) : (
-						<p className="mt-0.5 text-2xl font-semibold tabular-nums">
+						<p className="display-title mt-1 text-4xl font-medium tabular-nums">
 							{item.value}
 						</p>
 					)}

@@ -1,3 +1,4 @@
+import { CircleAlert, RefreshCw } from "lucide-react";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -6,6 +7,7 @@ import {
 	AlertDialogDescription,
 	AlertDialogFooter,
 	AlertDialogHeader,
+	AlertDialogMedia,
 	AlertDialogTitle,
 } from "#/components/ui/alert-dialog";
 import { m } from "#/paraglide/messages";
@@ -33,6 +35,13 @@ export function ConfirmDialog({
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent>
 				<AlertDialogHeader>
+					<AlertDialogMedia>
+						{destructive ? (
+							<CircleAlert aria-hidden="true" />
+						) : (
+							<RefreshCw aria-hidden="true" />
+						)}
+					</AlertDialogMedia>
 					<AlertDialogTitle>{title}</AlertDialogTitle>
 					<AlertDialogDescription>{description}</AlertDialogDescription>
 				</AlertDialogHeader>

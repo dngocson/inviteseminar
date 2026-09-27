@@ -1,3 +1,4 @@
+import { Atom } from "lucide-react";
 import type { ReactNode } from "react";
 import { Component, lazy, Suspense, useEffect, useRef, useState } from "react";
 
@@ -27,12 +28,10 @@ function StaticFallback() {
 	return (
 		<div
 			aria-hidden="true"
-			className="h-full w-full"
-			style={{
-				background:
-					"radial-gradient(circle at 38% 32%, rgba(63,156,150,0.55), transparent 60%), radial-gradient(circle at 65% 60%, rgba(255,106,82,0.35), transparent 55%), radial-gradient(circle at 50% 78%, rgba(205,191,160,0.45), transparent 60%)",
-			}}
-		/>
+			className="flex h-full w-full items-center justify-center text-(--mineral)"
+		>
+			<Atom className="size-32" strokeWidth={0.6} />
+		</div>
 	);
 }
 

@@ -1,4 +1,4 @@
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
@@ -13,17 +13,17 @@ interface Atom {
 // larger "core" atom, a coral highlight, and a few mineral satellites
 // connected by bonds, loosely resembling a molecule diagram.
 const ATOMS: Atom[] = [
-	{ id: "core", position: [0, 0, 0], radius: 0.62, color: "#3f9c96" },
-	{ id: "sat-1", position: [1.05, 0.55, 0.2], radius: 0.34, color: "#cdbfa0" },
-	{ id: "sat-2", position: [-0.95, 0.5, -0.35], radius: 0.3, color: "#cdbfa0" },
-	{ id: "sat-3", position: [0.35, -1.0, 0.4], radius: 0.26, color: "#ff6a52" },
+	{ id: "core", position: [0, 0, 0], radius: 0.62, color: "#467b70" },
+	{ id: "sat-1", position: [1.05, 0.55, 0.2], radius: 0.34, color: "#c7b27b" },
+	{ id: "sat-2", position: [-0.95, 0.5, -0.35], radius: 0.3, color: "#e1e8e2" },
+	{ id: "sat-3", position: [0.35, -1.0, 0.4], radius: 0.26, color: "#a58a53" },
 	{
 		id: "sat-4",
 		position: [-0.6, -0.85, -0.15],
 		radius: 0.24,
-		color: "#cdbfa0",
+		color: "#e1e8e2",
 	},
-	{ id: "sat-5", position: [0.15, 0.95, -0.7], radius: 0.22, color: "#3f9c96" },
+	{ id: "sat-5", position: [0.15, 0.95, -0.7], radius: 0.22, color: "#467b70" },
 ];
 
 const atomById = new Map(ATOMS.map((atom) => [atom.id, atom]));
@@ -74,6 +74,8 @@ function Bond({
 
 function MoleculeGroup({ reducedMotion }: { reducedMotion: boolean }) {
 	const group = useRef<THREE.Group>(null);
+	const viewportWidth = useThree((state) => state.viewport.width);
+	const isWide = useThree((state) => state.size.width >= 1024);
 
 	useFrame((state, delta) => {
 		if (!group.current) return;
@@ -97,7 +99,7 @@ function MoleculeGroup({ reducedMotion }: { reducedMotion: boolean }) {
 	});
 
 	return (
-		<group ref={group}>
+		<group ref={group} position={[isWide ? viewportWidth * 0.25 : 0, 0, 0]}>
 			{BONDS.map(([fromId, toId]) => {
 				const from = atomById.get(fromId);
 				const to = atomById.get(toId);
@@ -115,9 +117,9 @@ function MoleculeGroup({ reducedMotion }: { reducedMotion: boolean }) {
 					<sphereGeometry args={[atom.radius, 48, 48]} />
 					<meshPhysicalMaterial
 						color={atom.color}
-						roughness={0.15}
-						metalness={0.05}
-						transmission={0.75}
+						roughness={0.22}
+						metalness={0.3}
+						transmission={0.25}
 						thickness={1.2}
 						ior={1.3}
 						clearcoat={1}
@@ -149,7 +151,7 @@ export function MoleculeCanvas({
 			<directionalLight
 				position={[-3, -2, -2]}
 				intensity={0.4}
-				color="#3f9c96"
+				color="#467b70"
 			/>
 			<MoleculeGroup reducedMotion={reducedMotion} />
 		</Canvas>

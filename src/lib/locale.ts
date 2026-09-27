@@ -8,19 +8,11 @@ import {
 	setLocale,
 } from "#/paraglide/runtime";
 
-// SSR always renders `baseLocale` (see docs/process.md "Known limitations" —
-// the server has no per-request access to the locale cookie). A returning
-// visitor's browser can already hold a *different* locale cookie from an
-// earlier page (e.g. they switched the invitation card to English, then
-// later opened /admin fresh) — client hydration must not read that cookie
-// on its very first render, or React throws a hydration mismatch (the
-// server's Vietnamese text vs. the client's English text) and discards and
-// rebuilds the whole subtree.
+// SSR always renders `baseLocale`.
 //
-// This override keeps every `m.xxx()` call reporting `baseLocale` — matching
-// SSR exactly — until `markHydrated()` runs (once, from `useLocaleRerender`
-// in each route's top-level component), at which point it starts reporting
-// the real cookie-backed locale.
+// On the first client render we also return `baseLocale`, regardless of
+// what locale cookie already exists in the browser. This guarantees that
+// the first client render matches SSR and avoids hydration mismatches.
 let hydrated = false;
 
 if (typeof window !== "undefined") {
@@ -34,32 +26,31 @@ function markHydrated() {
 }
 
 /**
- * Call once from the top-level component of every route (not from a shared
- * layout that only forwards `children` — a re-render triggered there would
- * be skipped for children whose element reference didn't change). Forces
- * that component to re-render exactly once right after hydration, so its
- * `m.xxx()` calls — and everything it constructs below it — can safely
- * switch from the server's base-locale text to the visitor's real locale.
+ * Makes ambient Paraglide messages (`m.xxx()`) switch from the SSR locale
+ * to the real browser locale after hydration.
  *
- * Returns `[localeKey, rerender]`:
- * - `rerender`: call after changing the locale yourself (e.g. an in-page
- *   switcher that doesn't navigate) to force the same kind of correction,
- *   since setting the cookie alone doesn't make React re-run `m.xxx()`.
- * - `localeKey`: put this on a wrapping element's `key` prop. Components
- *   that only read the ambient locale via `m.xxx()` — without receiving it
- *   as a prop — give React Compiler no reason to think their output needs
- *   to change, so it can memoize past a plain re-render and leave stale
- *   text on screen. Changing `key` forces a full remount, which bypasses
- *   that memoization unconditionally. (The invitation card doesn't need
- *   this — it threads `locale` through props explicitly, which the
- *   compiler already tracks — but nothing else in this app does.)
+ * `localeKey` can be used as a React `key` to force a remount for components
+ * that read the ambient locale through `m.xxx()` instead of receiving locale
+ * through props.
+ *
+ * `rerender()` can be called after changing the locale manually because
+ * changing the cookie itself does not tell React that `m.xxx()` needs to
+ * be evaluated again.
  */
 export function useLocaleRerender(): [localeKey: number, rerender: () => void] {
 	const [tick, setTick] = useState(0);
-	const rerender = useCallback(() => setTick((t) => t + 1), []);
+
+	const rerender = useCallback(() => {
+		setTick((current) => current + 1);
+	}, []);
 
 	useEffect(() => {
+		// From this point onward, m.xxx() may read the real cookie-backed
+		// locale instead of the SSR/base locale.
 		markHydrated();
+
+		// Re-render once after hydration so ambient m.xxx() messages can
+		// switch from baseLocale to the browser's actual locale.
 		rerender();
 	}, [rerender]);
 
@@ -67,20 +58,52 @@ export function useLocaleRerender(): [localeKey: number, rerender: () => void] {
 }
 
 /**
- * Invitation-route-specific: on top of the hydration-safe re-render above,
- * syncs Paraglide's cookie-backed locale to the `l` search param — the
- * canonical, shareable source of truth for this app's locale (not a path
- * prefix, so Paraglide's own URL strategy doesn't apply; see
- * vite.config.ts) — and keeps `document.lang` in sync.
+ * Invitation route locale synchronization.
+ *
+ * The `l` search parameter is the canonical source of truth:
+ *
+ *   /?l=vi
+ *   /?l=en
+ *
+ * Whenever the URL locale changes:
+ *
+ *   URL locale
+ *      ↓
+ *   setLocale()
+ *      ↓
+ *   cookie updated
+ *      ↓
+ *   rerender()
+ *      ↓
+ *   m.xxx() reads the new locale
+ *
+ * The URL is intentionally not changed here. Navigation is handled by
+ * TanStack Router / LanguageToggle.
  */
-export function useLocaleSync(locale: Locale) {
-	useLocaleRerender();
-
-	if (hydrated && getLocale() !== locale) {
-		setLocale(locale, { reload: false });
-	}
+export function useLocaleSync(
+	locale: Locale,
+): [localeKey: number, rerender: () => void] {
+	const [localeKey, rerender] = useLocaleRerender();
 
 	useEffect(() => {
+		// This effect runs after the hydration effect from
+		// useLocaleRerender(), so the first client render remains hydration-safe.
+		if (!hydrated) {
+			return;
+		}
+
+		const currentLocale = getLocale();
+
+		if (currentLocale !== locale) {
+			setLocale(locale, { reload: false });
+
+			// setLocale() updates the cookie, but React does not know that
+			// components calling m.xxx() need to render again.
+			rerender();
+		}
+
 		document.documentElement.lang = locale;
-	}, [locale]);
+	}, [locale, rerender]);
+
+	return [localeKey, rerender];
 }

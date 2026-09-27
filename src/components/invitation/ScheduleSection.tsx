@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
 
 import { Countdown } from "#/components/invitation/Countdown";
@@ -41,7 +42,8 @@ export function ScheduleSection({
 
 	return (
 		<motion.section
-			className="px-6 py-14"
+			id="information"
+			className="invitation-section min-w-0 px-6 py-12 sm:px-10 sm:py-16"
 			initial={{ opacity: 0, y: 20 }}
 			whileInView={{ opacity: 1, y: 0 }}
 			viewport={{ once: true, margin: "-80px" }}
@@ -52,8 +54,8 @@ export function ScheduleSection({
 				{m.schedule_title()}
 			</h2>
 
-			<div className="lab-card mt-5 rounded-3xl p-5">
-				<dl className="grid grid-cols-1 gap-3 text-sm">
+			<div className="mt-7">
+				<dl className="schedule-facts grid grid-cols-1 gap-5 text-sm">
 					<div className="flex justify-between gap-4">
 						<dt className="font-medium text-(--carbon-soft)">
 							{m.schedule_date_label()}
@@ -87,14 +89,15 @@ export function ScheduleSection({
 					href={mapUrl}
 					target="_blank"
 					rel="noreferrer"
-					className="mt-4 flex min-h-11 w-full items-center justify-center rounded-full bg-(--mineral) px-4 text-sm font-semibold text-white transition-colors hover:bg-(--mineral-deep)"
+					className="invitation-cta mt-7 inline-flex min-h-12 items-center justify-center gap-3 rounded-md  px-6 text-sm font-semibold text-white transition-colors bg-[#d9a75c]  hover:bg-[#c58c37]"
 				>
 					{m.schedule_map_cta()}
+					<ArrowUpRight className="size-4" aria-hidden="true" />
 				</a>
 			</div>
 
-			<div className="mt-6">
-				<p className="mb-2 text-center text-xs font-semibold uppercase tracking-wide text-(--carbon-soft)">
+			<div className="mt-10">
+				<p className="mb-4 text-xs font-medium text-(--carbon-soft)">
 					{m.countdown_title()}
 				</p>
 				<Countdown startsAt={startsAt} />

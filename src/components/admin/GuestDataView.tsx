@@ -17,6 +17,7 @@ import { Button } from "#/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
@@ -25,6 +26,7 @@ import { Input } from "#/components/ui/input";
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
@@ -105,24 +107,26 @@ function RowActions({ guest }: { guest: GuestWithRsvpDto }) {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
-					<GuestFormDialog
-						guest={guest}
-						trigger={
-							<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-								<Pencil /> {m.admin_edit_guest()}
-							</DropdownMenuItem>
-						}
-					/>
-					<DropdownMenuItem onSelect={() => setConfirmRegenerate(true)}>
-						<RefreshCw /> {m.admin_regenerate_code()}
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<DropdownMenuItem
-						variant="destructive"
-						onSelect={() => setConfirmDelete(true)}
-					>
-						<Trash2 /> {m.admin_delete_guest()}
-					</DropdownMenuItem>
+					<DropdownMenuGroup>
+						<GuestFormDialog
+							guest={guest}
+							trigger={
+								<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+									<Pencil /> {m.admin_edit_guest()}
+								</DropdownMenuItem>
+							}
+						/>
+						<DropdownMenuItem onSelect={() => setConfirmRegenerate(true)}>
+							<RefreshCw /> {m.admin_regenerate_code()}
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							variant="destructive"
+							onSelect={() => setConfirmDelete(true)}
+						>
+							<Trash2 /> {m.admin_delete_guest()}
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
 				</DropdownMenuContent>
 			</DropdownMenu>
 
@@ -173,11 +177,18 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 	}, [guests, search, statusFilter]);
 
 	return (
-		<div className="space-y-4">
+		<div className="flex min-w-0 flex-col gap-5">
+			<p className="text-xs text-muted-foreground" aria-live="polite">
+				{m.admin_results_count({
+					count: filtered.length,
+					total: guests.length,
+				})}
+			</p>
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-				<div className="relative sm:max-w-xs">
+				<div className="relative w-full sm:max-w-sm">
 					<Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
+						aria-label={m.admin_search_placeholder()}
 						placeholder={m.admin_search_placeholder()}
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
@@ -188,30 +199,37 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 					value={statusFilter}
 					onValueChange={(value) => setStatusFilter(value as StatusFilter)}
 				>
-					<SelectTrigger className="sm:w-44">
+					<SelectTrigger
+						className="w-full sm:w-44"
+						aria-label={m.admin_table_status()}
+					>
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">{m.admin_filter_all()}</SelectItem>
-						<SelectItem value="attending">
-							{m.admin_filter_attending()}
-						</SelectItem>
-						<SelectItem value="declined">
-							{m.admin_filter_declined()}
-						</SelectItem>
-						<SelectItem value="pending">{m.admin_filter_pending()}</SelectItem>
+						<SelectGroup>
+							<SelectItem value="all">{m.admin_filter_all()}</SelectItem>
+							<SelectItem value="attending">
+								{m.admin_filter_attending()}
+							</SelectItem>
+							<SelectItem value="declined">
+								{m.admin_filter_declined()}
+							</SelectItem>
+							<SelectItem value="pending">
+								{m.admin_filter_pending()}
+							</SelectItem>
+						</SelectGroup>
 					</SelectContent>
 				</Select>
 			</div>
 
 			{filtered.length === 0 ? (
-				<p className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
-					{m.admin_empty_state()}
+				<p className="border-y border-dashed py-16 text-center text-sm text-muted-foreground">
+					{guests.length === 0 ? m.admin_empty_state() : m.admin_no_results()}
 				</p>
 			) : (
 				<>
 					{/* Desktop table */}
-					<div className="hidden overflow-hidden rounded-2xl border bg-card md:block">
+					<div className="admin-guest-table hidden overflow-hidden border-y bg-card md:block">
 						<Table>
 							<TableHeader>
 								<TableRow className="hover:bg-transparent">
@@ -270,12 +288,12 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 					</div>
 
 					{/* Mobile list */}
-					<div className="space-y-3 md:hidden">
+					<div className="flex flex-col gap-3 md:hidden">
 						{filtered.map((guest) => (
-							<div key={guest.id} className="rounded-2xl border bg-card p-4">
+							<div key={guest.id} className="rounded-lg border bg-card p-5">
 								<div className="flex items-start justify-between gap-2">
-									<div>
-										<p className="font-medium">{guest.fullName}</p>
+									<div className="min-w-0">
+										<p className="break-words font-medium">{guest.fullName}</p>
 										<p className="font-mono text-xs text-muted-foreground">
 											{guest.inviteCode} ({guest.locale.toUpperCase()})
 										</p>
