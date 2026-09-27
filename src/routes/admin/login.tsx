@@ -78,9 +78,7 @@ function AdminLoginPage() {
 					strokeWidth={1}
 					aria-hidden="true"
 				/>
-				<p className="max-w-xs text-xs leading-relaxed font-semibold text-primary">
-					{localized(eventConfig.seminarName, getLocale())}
-				</p>
+
 				<h1 className="display-title mt-6 text-4xl font-medium">
 					{m.admin_login_title()}
 				</h1>

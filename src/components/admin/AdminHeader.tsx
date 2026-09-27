@@ -73,9 +73,6 @@ export function AdminHeader({ email, onLocaleChange }: AdminHeaderProps) {
 					<h1 className="display-title text-3xl font-medium sm:text-4xl">
 						{m.admin_dashboard_title()}
 					</h1>
-					<p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-						{localized(eventConfig.seminarName, locale)}
-					</p>
 				</div>
 				<Button variant="outline" asChild>
 					<Link to="/" search={{ l: locale }} target="_blank" rel="noreferrer">
