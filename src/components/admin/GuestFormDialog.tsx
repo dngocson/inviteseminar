@@ -36,8 +36,8 @@ import {
 	useUpdateGuestMutation,
 } from "#/hooks/use-admin-guests";
 import { ApiRequestError } from "#/lib/api-client";
+import { useMessages } from "#/lib/locale";
 import type { GuestWithRsvpDto, Locale } from "#/lib/schemas";
-import { m } from "#/paraglide/messages";
 
 interface GuestFormDialogProps {
 	trigger: ReactNode;
@@ -45,6 +45,7 @@ interface GuestFormDialogProps {
 }
 
 export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
+	const m = useMessages();
 	const [open, setOpen] = useState(false);
 	const createMutation = useCreateGuestMutation();
 	const updateMutation = useUpdateGuestMutation();

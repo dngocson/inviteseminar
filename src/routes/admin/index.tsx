@@ -13,8 +13,7 @@ import {
 } from "#/hooks/use-admin-guests";
 import { checkAdminSession } from "#/lib/admin-session-fn";
 import { useAdminTheme } from "#/lib/admin-theme";
-import { useLocaleRerender } from "#/lib/locale";
-import { m } from "#/paraglide/messages";
+import { useMessages } from "#/lib/locale";
 
 export const Route = createFileRoute("/admin/")({
 	beforeLoad: async () => {
@@ -28,17 +27,14 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminDashboard() {
+	const m = useMessages();
 	const { adminEmail } = Route.useRouteContext();
 	useAdminTheme();
-	const [localeKey, rerenderForLocale] = useLocaleRerender();
 	const guestsQuery = useAdminGuestsQuery(true);
 	const statsQuery = useAdminStatsQuery(true);
 	return (
-		<div
-			key={localeKey}
-			className="admin-workspace mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 sm:px-8 sm:py-10"
-		>
-			<AdminHeader email={adminEmail} onLocaleChange={rerenderForLocale} />
+		<div className="admin-workspace mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 sm:px-8 sm:py-10">
+			<AdminHeader email={adminEmail} />
 
 			<StatsGrid stats={statsQuery.data} />
 

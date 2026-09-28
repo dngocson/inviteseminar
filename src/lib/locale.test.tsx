@@ -1,24 +1,28 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import {
+	act,
+	cleanup,
+	fireEvent,
+	render,
+	screen,
+} from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 
-import { useLocaleRerender } from "#/lib/locale";
-import { m } from "#/paraglide/messages";
-import { locales, setLocale } from "#/paraglide/runtime";
+import { changeLocale, LocaleProvider, useMessages } from "#/lib/locale";
+import { locales } from "#/paraglide/runtime";
+
+function Title() {
+	const m = useMessages();
+	return <p data-testid="text">{m.admin_dashboard_title()}</p>;
+}
 
 function TestDashboard() {
-	const [localeKey, rerender] = useLocaleRerender();
+	const m = useMessages();
 	return (
-		<div key={localeKey}>
-			<p data-testid="text">{m.admin_dashboard_title()}</p>
+		<div>
+			<h1 data-testid="parent">{m.admin_guest_list_title()}</h1>
+			<Title />
 			{locales.map((l) => (
-				<button
-					key={l}
-					type="button"
-					onClick={() => {
-						setLocale(l, { reload: false });
-						rerender();
-					}}
-				>
+				<button key={l} type="button" onClick={() => changeLocale(l)}>
 					{l}
 				</button>
 			))}
@@ -26,13 +30,27 @@ function TestDashboard() {
 	);
 }
 
-describe("useLocaleRerender", () => {
-	it("updates rendered text after clicking a locale switcher", () => {
+describe("useMessages", () => {
+	afterEach(cleanup);
+
+	it("updates parent and child text after clicking a locale switcher", () => {
+		act(() => changeLocale("vi"));
 		render(<TestDashboard />);
 		expect(screen.getByTestId("text").textContent).toBe("Quản lý khách mời");
 
 		fireEvent.click(screen.getByText("en"));
 
+		expect(screen.getByTestId("text").textContent).toBe("Guest management");
+		expect(screen.getByTestId("parent").textContent).toBe("Guest list");
+	});
+
+	it("prefers the LocaleProvider locale over the stored one", () => {
+		act(() => changeLocale("vi"));
+		render(
+			<LocaleProvider locale="en">
+				<Title />
+			</LocaleProvider>,
+		);
 		expect(screen.getByTestId("text").textContent).toBe("Guest management");
 	});
 });

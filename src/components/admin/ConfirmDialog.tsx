@@ -10,7 +10,7 @@ import {
 	AlertDialogMedia,
 	AlertDialogTitle,
 } from "#/components/ui/alert-dialog";
-import { m } from "#/paraglide/messages";
+import { useMessages } from "#/lib/locale";
 
 interface ConfirmDialogProps {
 	open: boolean;
@@ -31,6 +31,7 @@ export function ConfirmDialog({
 	isPending,
 	destructive,
 }: ConfirmDialogProps) {
+	const m = useMessages();
 	return (
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent>

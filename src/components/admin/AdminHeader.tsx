@@ -2,19 +2,18 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowUpRight, Atom, LogOut } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { useLogoutMutation } from "#/hooks/use-admin-auth";
-import { m } from "#/paraglide/messages";
-import { getLocale, locales, setLocale } from "#/paraglide/runtime";
+import { changeLocale, useLocale, useMessages } from "#/lib/locale";
+import { locales } from "#/paraglide/runtime";
 
 interface AdminHeaderProps {
 	email: string | null;
-	/** Re-renders the whole dashboard so every `m.xxx()` call on the page picks up the new locale, not just this header. */
-	onLocaleChange: () => void;
 }
 
-export function AdminHeader({ email, onLocaleChange }: AdminHeaderProps) {
+export function AdminHeader({ email }: AdminHeaderProps) {
+	const m = useMessages();
 	const navigate = useNavigate();
 	const logoutMutation = useLogoutMutation();
-	const locale = getLocale();
+	const locale = useLocale();
 
 	return (
 		<header className="admin-header flex flex-col gap-8 pb-7">
@@ -46,10 +45,7 @@ export function AdminHeader({ email, onLocaleChange }: AdminHeaderProps) {
 										? "bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground uppercase"
 										: "px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase hover:bg-accent"
 								}
-								onClick={() => {
-									setLocale(l, { reload: false });
-									onLocaleChange();
-								}}
+								onClick={() => changeLocale(l)}
 							>
 								{l}
 							</button>

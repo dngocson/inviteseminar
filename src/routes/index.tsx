@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { CalendarDays } from "lucide-react";
+import { z } from "zod";
 
 import { HeroSection } from "#/components/invitation/HeroSection";
 import { InvitationShell } from "#/components/invitation/InvitationShell";
@@ -7,44 +9,51 @@ import { OutroSection } from "#/components/invitation/OutroSection";
 import { RsvpSection } from "#/components/invitation/RsvpSection";
 import { ScheduleSection } from "#/components/invitation/ScheduleSection";
 import { TimelineSection } from "#/components/invitation/TimelineSection";
+import { Button } from "#/components/ui/button";
 import { eventConfig, localized } from "#/content/event";
 import { useInvitationQuery } from "#/hooks/use-invitation";
 import { ApiRequestError } from "#/lib/api-client";
-import { useLocaleSync } from "#/lib/locale";
-import { invitationSearchSchema } from "#/lib/schemas";
+import { LocaleProvider, useLocaleSync, useMessages } from "#/lib/locale";
+import { invitationSearchSchema, inviteCodeSchema } from "#/lib/schemas";
 import { m } from "#/paraglide/messages";
 
 export const Route = createFileRoute("/")({
-	validateSearch: invitationSearchSchema,
-
-	head: () => ({
-		meta: [
-			{ title: m.site_title() },
-			{
-				name: "description",
-				content: m.site_description(),
-			},
-		],
+	// Accept any `k` here so a malformed code shows the "invalid invite"
+	// screen instead of a router error; the format is checked in Home.
+	validateSearch: invitationSearchSchema.extend({
+		k: z.string().optional(),
 	}),
+
+	head: ({ match }) => {
+		const options = { locale: match.search.l };
+		return {
+			meta: [
+				{ title: m.site_title({}, options) },
+				{
+					name: "description",
+					content: m.site_description({}, options),
+				},
+			],
+		};
+	},
 
 	component: Home,
 });
 
 function Home() {
 	const { k: code, l: locale } = Route.useSearch();
-	const [localeKey] = useLocaleSync(locale);
-	if (!code) {
-		return (
-			<div key={localeKey}>
-				<EventContent locale={locale} />
-			</div>
-		);
-	}
+	useLocaleSync(locale);
 
 	return (
-		<div key={localeKey}>
-			<InvitationContent code={code} locale={locale} />
-		</div>
+		<LocaleProvider locale={locale}>
+			{!code ? (
+				<EventContent locale={locale} />
+			) : !inviteCodeSchema.safeParse(code).success ? (
+				<InvalidInviteScreen locale={locale} />
+			) : (
+				<InvitationContent code={code} locale={locale} />
+			)}
+		</LocaleProvider>
 	);
 }
 
@@ -85,6 +94,25 @@ function EventDetails({ locale }: { locale: "vi" | "en" }) {
 	);
 }
 
+/** Wrong or unknown invite code: offer the public event page instead. */
+function InvalidInviteScreen({ locale }: { locale: "vi" | "en" }) {
+	const m = useMessages();
+	return (
+		<InvitationStatusScreen
+			title={m.invite_invalid_title()}
+			body={m.invite_invalid_body()}
+			action={
+				<Button variant="outline" asChild className="mt-6">
+					<Link to="/" search={{ l: locale }}>
+						<CalendarDays data-icon="inline-start" />
+						{m.invite_view_event()}
+					</Link>
+				</Button>
+			}
+		/>
+	);
+}
+
 function InvitationContent({
 	code,
 	locale,
@@ -92,6 +120,7 @@ function InvitationContent({
 	code: string;
 	locale: "vi" | "en";
 }) {
+	const m = useMessages();
 	const { data: invitation, isPending, error } = useInvitationQuery(code);
 
 	if (isPending) {
@@ -99,13 +128,14 @@ function InvitationContent({
 	}
 
 	if (error) {
-		const isNotFound =
-			error instanceof ApiRequestError && error.code === "NOT_FOUND";
+		if (error instanceof ApiRequestError && error.code === "NOT_FOUND") {
+			return <InvalidInviteScreen locale={locale} />;
+		}
 
 		return (
 			<InvitationStatusScreen
-				title={isNotFound ? m.invite_invalid_title() : m.invite_error_title()}
-				body={isNotFound ? m.invite_invalid_body() : m.invite_error_body()}
+				title={m.invite_error_title()}
+				body={m.invite_error_body()}
 			/>
 		);
 	}

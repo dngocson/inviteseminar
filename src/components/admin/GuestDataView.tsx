@@ -43,6 +43,7 @@ import {
 	useDeleteGuestMutation,
 	useRegenerateInviteCodeMutation,
 } from "#/hooks/use-admin-guests";
+import { useMessages } from "#/lib/locale";
 import type { GuestWithRsvpDto } from "#/lib/schemas";
 import { m } from "#/paraglide/messages";
 
@@ -54,6 +55,7 @@ function guestStatus(guest: GuestWithRsvpDto): StatusFilter {
 }
 
 function StatusBadge({ status }: { status: StatusFilter }) {
+	const m = useMessages();
 	if (status === "attending")
 		return <Badge>{m.admin_filter_attending()}</Badge>;
 	if (status === "declined")
@@ -71,6 +73,7 @@ async function copyLink(url: string) {
 }
 
 function RowActions({ guest }: { guest: GuestWithRsvpDto }) {
+	const m = useMessages();
 	const [confirmDelete, setConfirmDelete] = useState(false);
 	const [confirmRegenerate, setConfirmRegenerate] = useState(false);
 	const deleteMutation = useDeleteGuestMutation();
@@ -160,6 +163,7 @@ function RowActions({ guest }: { guest: GuestWithRsvpDto }) {
 }
 
 export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
+	const m = useMessages();
 	const [search, setSearch] = useState("");
 	const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 

@@ -2,8 +2,8 @@ import { MotionConfig } from "motion/react";
 import type { ReactNode } from "react";
 import { LanguageToggle } from "#/components/invitation/LanguageToggle";
 import { eventConfig, localized } from "#/content/event";
+import { useMessages } from "#/lib/locale";
 import type { Locale } from "#/lib/schemas";
-import { m } from "#/paraglide/messages";
 export function InvitationShell({
 	locale,
 	children,
@@ -13,6 +13,7 @@ export function InvitationShell({
 	children: ReactNode;
 	hasRsvp?: boolean;
 }) {
+	const m = useMessages();
 	return (
 		<MotionConfig reducedMotion="user">
 			<div className="lab-theme invitation-shell relative min-h-dvh w-full">

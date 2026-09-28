@@ -2,8 +2,8 @@ import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
 
 import { Countdown } from "#/components/invitation/Countdown";
+import { useMessages } from "#/lib/locale";
 import type { Locale } from "#/lib/schemas";
-import { m } from "#/paraglide/messages";
 
 interface ScheduleSectionProps {
 	startsAt: string;
@@ -20,6 +20,7 @@ export function ScheduleSection({
 	mapUrl,
 	locale,
 }: ScheduleSectionProps) {
+	const m = useMessages();
 	const date = new Date(startsAt);
 	const dateFormatter = new Intl.DateTimeFormat(
 		locale === "vi" ? "vi-VN" : "en-US",

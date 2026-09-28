@@ -3,8 +3,7 @@ import { ArrowDown, CalendarDays } from "lucide-react";
 import { motion } from "motion/react";
 
 import { eventConfig } from "#/content/event";
-import { m } from "#/paraglide/messages";
-import { getLocale } from "#/paraglide/runtime";
+import { useLocale, useMessages } from "#/lib/locale";
 
 interface HeroSectionProps {
 	/** Omitted on the public (no invite code) page: the event name becomes the heading. */
@@ -42,8 +41,10 @@ export function HeroSection({
 	seminarName,
 	organizer,
 }: HeroSectionProps) {
+	const m = useMessages();
+	const locale = useLocale();
 	const dateLabel = new Intl.DateTimeFormat(
-		getLocale() === "vi" ? "vi-VN" : "en-US",
+		locale === "vi" ? "vi-VN" : "en-US",
 		{
 			day: "2-digit",
 			month: "long",
@@ -119,7 +120,7 @@ export function HeroSection({
 
 					<motion.p
 						variants={item}
-						className="mx-auto mt-6 max-w-lg text-center text-sm leading-relaxed text-[#b7bcd6]"
+						className="mx-auto mt-6 max-w-xl text-center text-sm leading-relaxed text-[#b7bcd6]"
 					>
 						{m.hero_subtitle()}
 					</motion.p>

@@ -1,8 +1,8 @@
 import { motion } from "motion/react";
-
-import { m } from "#/paraglide/messages";
+import { useMessages } from "#/lib/locale";
 
 export function OutroSection({ organizer }: { organizer: string }) {
+	const m = useMessages();
 	return (
 		<motion.section
 			className="invitation-outro lab-safe-bottom relative isolate overflow-hidden px-4 py-8 text-center sm:px-8 sm:py-18"

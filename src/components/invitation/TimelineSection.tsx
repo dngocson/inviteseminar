@@ -1,8 +1,8 @@
 import { motion } from "motion/react";
 import type { TimelineItem } from "#/content/event";
 import { localized } from "#/content/event";
+import { useMessages } from "#/lib/locale";
 import type { Locale } from "#/lib/schemas";
-import { m } from "#/paraglide/messages";
 
 export function TimelineSection({
 	items,
@@ -11,6 +11,7 @@ export function TimelineSection({
 	items: TimelineItem[];
 	locale: Locale;
 }) {
+	const m = useMessages();
 	return (
 		<section
 			id="program"

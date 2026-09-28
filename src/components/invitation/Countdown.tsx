@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { m } from "#/paraglide/messages";
+import { useMessages } from "#/lib/locale";
 
 export interface Remaining {
 	days: number;
@@ -26,6 +26,7 @@ function pad(value: number): string {
 }
 
 export function Countdown({ startsAt }: { startsAt: string }) {
+	const m = useMessages();
 	const targetMs = new Date(startsAt).getTime();
 	// `null` until the first client effect runs, so SSR and the first client
 	// render both show the same "loading" shape — no hydration mismatch from

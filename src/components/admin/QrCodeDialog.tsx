@@ -13,8 +13,8 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "#/components/ui/dialog";
+import { useMessages } from "#/lib/locale";
 import { buildQrCardCanvas } from "#/lib/qr-card";
-import { m } from "#/paraglide/messages";
 
 interface QrCodeDialogProps {
 	trigger: ReactNode;
@@ -27,6 +27,7 @@ export function QrCodeDialog({
 	guestName,
 	inviteUrl,
 }: QrCodeDialogProps) {
+	const m = useMessages();
 	const [open, setOpen] = useState(false);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 

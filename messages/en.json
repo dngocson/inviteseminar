@@ -13,6 +13,7 @@
   "invite_missing_body": "This link doesn't have a valid invite code. Please check the invitation message you received.",
   "invite_invalid_title": "Invitation not found",
   "invite_invalid_body": "This invite code doesn't exist or has expired. Please contact the organizer for help.",
+  "invite_view_event": "View event details",
   "invite_error_title": "Something went wrong",
   "invite_error_body": "We couldn't load your invitation right now. Please try again in a few minutes.",
   "invite_loading": "Loading your invitation...",

@@ -22,9 +22,7 @@ import { useLoginMutation } from "#/hooks/use-admin-auth";
 import { checkAdminSession } from "#/lib/admin-session-fn";
 import { useAdminTheme } from "#/lib/admin-theme";
 import { ApiRequestError } from "#/lib/api-client";
-import { useLocaleRerender } from "#/lib/locale";
-import { m } from "#/paraglide/messages";
-import { getLocale } from "#/paraglide/runtime";
+import { useLocale, useMessages } from "#/lib/locale";
 
 export const Route = createFileRoute("/admin/login")({
 	beforeLoad: async () => {
@@ -37,8 +35,9 @@ export const Route = createFileRoute("/admin/login")({
 });
 
 function AdminLoginPage() {
+	const m = useMessages();
 	useAdminTheme();
-	useLocaleRerender();
+	const locale = useLocale();
 	const navigate = useNavigate();
 	const mutation = useLoginMutation();
 	const [formError, setFormError] = useState<string | null>(null);
@@ -67,7 +66,7 @@ function AdminLoginPage() {
 				asChild
 				className="absolute top-6 left-4 sm:left-8"
 			>
-				<Link to="/" search={{ l: getLocale() }}>
+				<Link to="/" search={{ l: locale }}>
 					<ArrowLeft data-icon="inline-start" />
 					{m.admin_open_event()}
 				</Link>
@@ -154,7 +153,7 @@ function AdminLoginPage() {
 					</Button>
 				</form>
 				<p className="mt-10 border-t pt-5 text-xs leading-relaxed text-muted-foreground">
-					{localized(eventConfig.organizer, getLocale())}
+					{localized(eventConfig.organizer, locale)}
 				</p>
 			</div>
 		</div>

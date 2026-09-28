@@ -13,6 +13,7 @@
   "invite_missing_body": "Đường dẫn này chưa có mã mời hợp lệ. Vui lòng kiểm tra lại tin nhắn mời của Anh/Chị.",
   "invite_invalid_title": "Không tìm thấy lời mời",
   "invite_invalid_body": "Mã mời không tồn tại hoặc đã hết hạn. Vui lòng liên hệ ban tổ chức để được hỗ trợ.",
+  "invite_view_event": "Xem thông tin sự kiện",
   "invite_error_title": "Đã có lỗi xảy ra",
   "invite_error_body": "Không thể tải thông tin lời mời lúc này. Vui lòng thử lại sau ít phút.",
   "invite_loading": "Đang tải lời mời...",

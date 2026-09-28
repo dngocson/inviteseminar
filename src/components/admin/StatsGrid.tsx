@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { Skeleton } from "#/components/ui/skeleton";
+import { useMessages } from "#/lib/locale";
 import type { RsvpStatsDto } from "#/lib/schemas";
-import { m } from "#/paraglide/messages";
 
 interface StatItem {
 	label: string;
@@ -20,6 +20,7 @@ interface StatItem {
 }
 
 export function StatsGrid({ stats }: { stats: RsvpStatsDto | undefined }) {
+	const m = useMessages();
 	const items: StatItem[] = [
 		{ label: m.admin_stats_total(), value: stats?.totalGuests, icon: Users },
 		{

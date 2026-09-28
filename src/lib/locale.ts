@@ -1,18 +1,33 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+	createContext,
+	createElement,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useSyncExternalStore,
+} from "react";
 import type { Locale } from "#/lib/schemas";
+import { m } from "#/paraglide/messages";
 import {
 	baseLocale,
 	extractLocaleFromCookie,
-	getLocale,
 	overwriteGetLocale,
 	setLocale,
 } from "#/paraglide/runtime";
 
-// SSR always renders `baseLocale`.
+// Why not call the ambient `m.xxx()` in render?
 //
-// On the first client render we also return `baseLocale`, regardless of
-// what locale cookie already exists in the browser. This guarantees that
-// the first client render matches SSR and avoids hydration mismatches.
+// The React Compiler memoizes `m.xxx()` forever: it has no reactive input,
+// so switching the locale never re-evaluates it. Components read messages
+// through `useMessages()` instead, which returns a locale-bound copy of `m`.
+// That copy changes identity with the locale, so the compiler recomputes
+// exactly what depends on it — no remount, no page "reload".
+//
+// Ambient `m.xxx()` / `getLocale()` stay fine outside render (event
+// handlers, toasts, route `head`).
+
+// SSR always renders `baseLocale`. Ambient reads also return `baseLocale`
+// until the client has hydrated, so the first client render matches SSR.
 let hydrated = false;
 
 if (typeof window !== "undefined") {
@@ -21,89 +36,104 @@ if (typeof window !== "undefined") {
 	);
 }
 
-function markHydrated() {
-	hydrated = true;
+const listeners = new Set<() => void>();
+
+function subscribe(listener: () => void) {
+	listeners.add(listener);
+	return () => {
+		listeners.delete(listener);
+	};
+}
+
+function getClientSnapshot(): Locale {
+	return extractLocaleFromCookie() ?? baseLocale;
+}
+
+function getServerSnapshot(): Locale {
+	return baseLocale;
+}
+
+/** Persists the locale (cookie) and re-renders every `useLocale()` reader. */
+export function changeLocale(locale: Locale) {
+	if (getClientSnapshot() !== locale) {
+		setLocale(locale, { reload: false });
+	}
+	document.documentElement.lang = locale;
+	for (const listener of listeners) {
+		listener();
+	}
 }
 
 /**
- * Makes ambient Paraglide messages (`m.xxx()`) switch from the SSR locale
- * to the real browser locale after hydration.
- *
- * `localeKey` can be used as a React `key` to force a remount for components
- * that read the ambient locale through `m.xxx()` instead of receiving locale
- * through props.
- *
- * `rerender()` can be called after changing the locale manually because
- * changing the cookie itself does not tell React that `m.xxx()` needs to
- * be evaluated again.
+ * Pins the locale for a subtree, e.g. the invitation page where the `?l=`
+ * search param is the source of truth. Because the URL is known on the
+ * server too, SSR and hydration render the right language immediately.
  */
-export function useLocaleRerender(): [localeKey: number, rerender: () => void] {
-	const [tick, setTick] = useState(0);
+const LocaleOverrideContext = createContext<Locale | null>(null);
 
-	const rerender = useCallback(() => {
-		setTick((current) => current + 1);
+export function LocaleProvider({
+	locale,
+	children,
+}: {
+	locale: Locale;
+	children: ReactNode;
+}) {
+	return createElement(
+		LocaleOverrideContext.Provider,
+		{ value: locale },
+		children,
+	);
+}
+
+export function useLocale(): Locale {
+	const override = useContext(LocaleOverrideContext);
+	const stored = useSyncExternalStore(
+		subscribe,
+		getClientSnapshot,
+		getServerSnapshot,
+	);
+
+	useEffect(() => {
+		hydrated = true;
 	}, []);
 
-	useEffect(() => {
-		// From this point onward, m.xxx() may read the real cookie-backed
-		// locale instead of the SSR/base locale.
-		markHydrated();
+	return override ?? stored;
+}
 
-		// Re-render once after hydration so ambient m.xxx() messages can
-		// switch from baseLocale to the browser's actual locale.
-		rerender();
-	}, [rerender]);
+type Messages = typeof m;
 
-	return [tick, rerender];
+const boundMessages = new Map<Locale, Messages>();
+
+function bindMessages(locale: Locale): Messages {
+	let bound = boundMessages.get(locale);
+	if (!bound) {
+		bound = Object.fromEntries(
+			Object.entries(m).map(([key, message]) => [
+				key,
+				(inputs?: object, options?: object) =>
+					(message as (i: object, o: object) => string)(inputs ?? {}, {
+						...options,
+						locale,
+					}),
+			]),
+		) as Messages;
+		boundMessages.set(locale, bound);
+	}
+	return bound;
+}
+
+/** Messages bound to the current locale; use instead of `m` in render. */
+export function useMessages(): Messages {
+	return bindMessages(useLocale());
 }
 
 /**
- * Invitation route locale synchronization.
- *
- * The `l` search parameter is the canonical source of truth:
- *
- *   /?l=vi
- *   /?l=en
- *
- * Whenever the URL locale changes:
- *
- *   URL locale
- *      ↓
- *   setLocale()
- *      ↓
- *   cookie updated
- *      ↓
- *   rerender()
- *      ↓
- *   m.xxx() reads the new locale
- *
- * The URL is intentionally not changed here. Navigation is handled by
- * TanStack Router / LanguageToggle.
+ * Invitation route: mirrors the URL locale (`?l=vi|en`) into the cookie so
+ * ambient reads (toasts, other pages) follow it. Rendering itself reads the
+ * URL locale through `LocaleProvider`, so nothing waits on this effect.
  */
-export function useLocaleSync(
-	locale: Locale,
-): [localeKey: number, rerender: () => void] {
-	const [localeKey, rerender] = useLocaleRerender();
-
+export function useLocaleSync(locale: Locale) {
 	useEffect(() => {
-		// This effect runs after the hydration effect from
-		// useLocaleRerender(), so the first client render remains hydration-safe.
-		if (!hydrated) {
-			return;
-		}
-
-		const currentLocale = getLocale();
-
-		if (currentLocale !== locale) {
-			setLocale(locale, { reload: false });
-
-			// setLocale() updates the cookie, but React does not know that
-			// components calling m.xxx() need to render again.
-			rerender();
-		}
-
-		document.documentElement.lang = locale;
-	}, [locale, rerender]);
-
-	return [localeKey, rerender];
+		changeLocale(locale);
+	}, [locale]);
 }

@@ -1,6 +1,6 @@
 import { CircleAlert, LoaderCircle } from "lucide-react";
 import type { ReactNode } from "react";
-import { m } from "#/paraglide/messages";
+import { useMessages } from "#/lib/locale";
 
 interface InvitationStatusScreenProps {
 	title: string;
@@ -13,6 +13,7 @@ export function InvitationStatusScreen({
 	body,
 	action,
 }: InvitationStatusScreenProps) {
+	const m = useMessages();
 	return (
 		<div className="lab-theme invitation-status flex min-h-dvh items-center justify-center px-6 py-16">
 			<div className="w-full max-w-sm text-center">

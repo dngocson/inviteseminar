@@ -1,8 +1,8 @@
 import { motion } from "motion/react";
 
 import { RsvpForm } from "#/components/invitation/RsvpForm";
+import { useMessages } from "#/lib/locale";
 import type { InvitationDto } from "#/lib/schemas";
-import { m } from "#/paraglide/messages";
 
 export function RsvpSection({
 	code,
@@ -11,6 +11,7 @@ export function RsvpSection({
 	code: string;
 	invitation: InvitationDto;
 }) {
+	const m = useMessages();
 	return (
 		<motion.section
 			id="rsvp"

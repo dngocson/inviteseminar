@@ -3,11 +3,10 @@ import { ArrowLeft } from "lucide-react";
 
 import { InvitationStatusScreen } from "#/components/invitation/InvitationStatusScreen";
 import { Button } from "#/components/ui/button";
-import { useLocaleRerender } from "#/lib/locale";
-import { m } from "#/paraglide/messages";
+import { useMessages } from "#/lib/locale";
 
 export function NotFoundPage() {
-	useLocaleRerender();
+	const m = useMessages();
 
 	return (
 		<InvitationStatusScreen
