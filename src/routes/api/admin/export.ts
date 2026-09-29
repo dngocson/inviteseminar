@@ -3,10 +3,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ApiError, withApiErrorHandling } from "#/lib/api-response";
 import { requireAdminUser } from "#/lib/auth";
 import { buildGuestXlsx } from "#/lib/guest-xlsx";
+import { mapRsvpRow, RSVP_COLUMNS, type RsvpRow } from "#/lib/rsvp-mapper";
 import { getSupabaseAdminClient } from "#/lib/supabase/admin";
 
-const GUEST_EXPORT_SELECT =
-	"invite_code, full_name, max_attendees, locale, rsvp:rsvps(responder_name, message, attending, attendee_count, updated_at)";
+const GUEST_EXPORT_SELECT = `invite_code, full_name, locale, rsvp:rsvps(${RSVP_COLUMNS})`;
 
 export const Route = createFileRoute("/api/admin/export")({
 	server: {
@@ -24,20 +24,14 @@ export const Route = createFileRoute("/api/admin/export")({
 					throw new ApiError("INTERNAL_ERROR", "Không thể xuất dữ liệu");
 
 				const rows = data.map((row) => {
-					const rsvp = Array.isArray(row.rsvp)
-						? (row.rsvp[0] ?? null)
-						: row.rsvp;
+					const rsvpRow = (
+						Array.isArray(row.rsvp) ? (row.rsvp[0] ?? null) : row.rsvp
+					) as RsvpRow | null;
 					return {
 						inviteCode: row.invite_code,
 						fullName: row.full_name,
-						maxAttendees: row.max_attendees,
 						locale: row.locale,
-						rsvp: rsvp && {
-							attending: rsvp.attending,
-							attendeeCount: rsvp.attendee_count,
-							message: rsvp.message,
-							updatedAt: rsvp.updated_at,
-						},
+						rsvp: rsvpRow && mapRsvpRow(rsvpRow),
 					};
 				});
 

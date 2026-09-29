@@ -63,6 +63,22 @@ function StatusBadge({ status }: { status: StatusFilter }) {
 	return <Badge variant="secondary">{m.admin_filter_pending()}</Badge>;
 }
 
+/** Company · position, phone, email — whichever the guest filled in. */
+function ContactDetails({ rsvp }: { rsvp: GuestWithRsvpDto["rsvp"] }) {
+	const role = [rsvp?.jobTitle, rsvp?.company].filter(Boolean).join(" · ");
+	const lines = [role, rsvp?.phone, rsvp?.email].filter(Boolean);
+	if (lines.length === 0) return "—";
+	return (
+		<div className="flex flex-col gap-0.5">
+			{lines.map((line) => (
+				<span key={line} className="break-words">
+					{line}
+				</span>
+			))}
+		</div>
+	);
+}
+
 async function copyLink(url: string) {
 	try {
 		await navigator.clipboard.writeText(url);
@@ -239,9 +255,11 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 								<TableRow className="hover:bg-transparent">
 									<TableHead>{m.admin_table_name()}</TableHead>
 									<TableHead>{m.admin_table_responder()}</TableHead>
+									<TableHead>{m.admin_table_contact()}</TableHead>
 									<TableHead>{m.admin_table_code()}</TableHead>
 									<TableHead>{m.admin_table_status()}</TableHead>
 									<TableHead>{m.admin_table_count()}</TableHead>
+									<TableHead>{m.admin_table_allergies()}</TableHead>
 									<TableHead>{m.admin_table_message()}</TableHead>
 									<TableHead>{m.admin_table_note()}</TableHead>
 									<TableHead>{m.admin_table_updated()}</TableHead>
@@ -259,6 +277,9 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 										<TableCell className="text-muted-foreground">
 											{guest.rsvp?.responderName || "—"}
 										</TableCell>
+										<TableCell className="max-w-56 text-xs text-muted-foreground">
+											<ContactDetails rsvp={guest.rsvp} />
+										</TableCell>
 										<TableCell className="font-mono text-xs text-muted-foreground">
 											{guest.inviteCode}
 											<span className="ml-1 font-sans uppercase">
@@ -270,6 +291,12 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 										</TableCell>
 										<TableCell className="tabular-nums">
 											{guest.rsvp?.attendeeCount ?? "—"}
+										</TableCell>
+										<TableCell
+											className="max-w-48 truncate text-muted-foreground"
+											title={guest.rsvp?.allergies ?? undefined}
+										>
+											{guest.rsvp?.allergies || "—"}
 										</TableCell>
 										<TableCell className="max-w-48 truncate text-muted-foreground">
 											{guest.rsvp?.message || "—"}
@@ -307,6 +334,16 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 								{guest.rsvp?.responderName && (
 									<p className="mt-1 text-xs text-muted-foreground">
 										{m.admin_table_responder()}: {guest.rsvp.responderName}
+									</p>
+								)}
+								{guest.rsvp && (
+									<div className="mt-2 text-xs text-muted-foreground">
+										<ContactDetails rsvp={guest.rsvp} />
+									</div>
+								)}
+								{guest.rsvp?.allergies && (
+									<p className="mt-2 text-sm text-muted-foreground">
+										{m.admin_table_allergies()}: {guest.rsvp.allergies}
 									</p>
 								)}
 								{guest.rsvp?.message && (

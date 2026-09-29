@@ -37,7 +37,8 @@ export const guestCreateSchema = z.object({
 	locale: localeSchema.default("vi"),
 	note: guestNoteSchema.optional().default(""),
 });
-export type GuestCreateInput = z.infer<typeof guestCreateSchema>;
+// Request body shape: fields with a schema default (e.g. maxAttendees) may be omitted.
+export type GuestCreateInput = z.input<typeof guestCreateSchema>;
 
 export const guestUpdateSchema = z.object({
 	fullName: z.string().trim().min(1).max(200).optional(),
@@ -64,6 +65,11 @@ export type GuestDto = z.infer<typeof guestDto>;
 // ---------------------------------------------------------------------------
 export const rsvpDto = z.object({
 	responderName: z.string(),
+	company: z.string().nullable(),
+	jobTitle: z.string().nullable(),
+	phone: z.string().nullable(),
+	email: z.string().nullable(),
+	allergies: z.string().nullable(),
 	message: z.string().nullable(),
 	attending: z.boolean(),
 	attendeeCount: z.number().int().min(0).max(10),
@@ -80,11 +86,33 @@ export type InvitationDto = z.infer<typeof invitationDto>;
 
 // ---------------------------------------------------------------------------
 // RSVP submission (public). `attending: false` forces attendeeCount to 0.
+// Contact fields are optional; an empty string means "not provided".
 // ---------------------------------------------------------------------------
+// Digits with the usual separators, optionally a leading `+`.
+export const PHONE_PATTERN = /^\+?[0-9(][0-9 ().-]{5,19}$/;
+
+const optionalText = (max: number) =>
+	z.string().trim().max(max).optional().default("");
+
 export const rsvpSubmitSchema = z
 	.object({
 		code: inviteCodeSchema,
 		responderName: z.string().trim().min(1).max(200),
+		company: optionalText(200),
+		jobTitle: optionalText(200),
+		phone: z
+			.string()
+			.trim()
+			.refine((value) => value === "" || PHONE_PATTERN.test(value), {
+				message: "Số điện thoại không hợp lệ",
+			})
+			.optional()
+			.default(""),
+		email: z
+			.union([z.literal(""), z.email({ message: "Email không hợp lệ" })])
+			.optional()
+			.default(""),
+		allergies: optionalText(1000),
 		message: z.string().trim().max(1000).optional().default(""),
 		attending: z.boolean(),
 		attendeeCount: z.number().int().min(0).max(10).default(0),

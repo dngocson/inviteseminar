@@ -22,7 +22,7 @@ export const eventConfig = {
   `,
 		vi: `
     <span class="block text-[1rem] sm:text-[2rem]">Không chỉ là Prebiotics:</span>
-    <span class="block whitespace-nowrap">Từ một đến muôn vai</span>
+    <span class="block whitespace-nowrap">Giải pháp đa chức năng</span>
     <span class="block text-[1rem] sm:text-[2rem]">cho mỹ phẩm hiện đại</span>
   `,
 	} satisfies Bilingual,
@@ -52,10 +52,10 @@ export const eventConfig = {
 
 	timeline: [
 		{
-			time: "08:00",
+			time: "08:00 - 08:30",
 			title: {
-				vi: "Check-in & Ổn định",
-				en: "Check-in & Seating",
+				vi: "Đón khách & Check-in",
+				en: "Guest Reception & Check-in",
 			},
 			description: {
 				vi: "Đón khách, check-in và ổn định chỗ ngồi trước khi chương trình bắt đầu.",
@@ -63,14 +63,14 @@ export const eventConfig = {
 			},
 		},
 		{
-			time: "08:30",
+			time: "08:30 - 08:45",
 			title: {
-				vi: "Khai mạc",
-				en: "Opening",
+				vi: "Ổn định & Khai mạc",
+				en: "Seating & Opening",
 			},
 			description: {
-				vi: "Phát biểu khai mạc và giới thiệu chương trình.",
-				en: "Opening remarks and an introduction to the program.",
+				vi: "Ổn định chỗ ngồi, giới thiệu và phần mở đầu",
+				en: "Seating, Introductions & Opening Remarks",
 			},
 		},
 		{
@@ -98,7 +98,7 @@ export const eventConfig = {
 		{
 			time: "10:45",
 			title: {
-				vi: "Không chỉ là Prebiotics – Những giải pháp đa chức năng cho mỹ phẩm ngày nay",
+				vi: "Không chỉ prebiotics - Cùng khám phá những giải pháp tân tiến mới",
 				en: "Beyond Prebiotics – Multifunctional Solutions for Today's Cosmetics",
 			},
 			description: {

@@ -14,19 +14,14 @@ import {
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "#/components/ui/select";
 import { Textarea } from "#/components/ui/textarea";
 import { useSubmitRsvpMutation } from "#/hooks/use-invitation";
 import { ApiRequestError } from "#/lib/api-client";
 import { useMessages } from "#/lib/locale";
-import type { InvitationDto } from "#/lib/schemas";
+import { type InvitationDto, PHONE_PATTERN } from "#/lib/schemas";
+
+// Same check `z.email()` applies server-side, loose enough for real addresses.
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface RsvpFormProps {
 	code: string;
@@ -35,9 +30,13 @@ interface RsvpFormProps {
 
 interface FormValues {
 	responderName: string;
+	company: string;
+	jobTitle: string;
+	phone: string;
+	email: string;
+	allergies: string;
 	message: string;
 	attending: "yes" | "no";
-	attendeeCount: number;
 }
 
 export function RsvpForm({ code, invitation }: RsvpFormProps) {
@@ -50,21 +49,31 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 	const form = useForm({
 		defaultValues: {
 			responderName: invitation.rsvp?.responderName ?? invitation.fullName,
+			company: invitation.rsvp?.company ?? "",
+			jobTitle: invitation.rsvp?.jobTitle ?? "",
+			phone: invitation.rsvp?.phone ?? "",
+			email: invitation.rsvp?.email ?? "",
+			allergies: invitation.rsvp?.allergies ?? "",
 			message: invitation.rsvp?.message ?? "",
 			attending: invitation.rsvp
 				? invitation.rsvp.attending
 					? "yes"
 					: "no"
 				: "yes",
-			attendeeCount: invitation.rsvp?.attendeeCount || 1,
 		} satisfies FormValues,
 		onSubmit: async ({ value }) => {
 			const attending = value.attending === "yes";
 			await mutation.mutateAsync({
 				responderName: value.responderName.trim(),
+				company: value.company.trim(),
+				jobTitle: value.jobTitle.trim(),
+				phone: value.phone.trim(),
+				email: value.email.trim(),
+				allergies: value.allergies.trim(),
 				message: value.message.trim(),
 				attending,
-				attendeeCount: attending ? value.attendeeCount : 0,
+				// The form no longer asks about companions: an attending guest is one person.
+				attendeeCount: attending ? 1 : 0,
 			});
 			setSubmittedAttending(attending);
 		},
@@ -159,26 +168,79 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 					)}
 				</form.Field>
 
-				<form.Field name="message">
-					{(field) => (
-						<Field>
-							<FieldContent>
-								<FieldLabel htmlFor={field.name}>
-									{m.rsvp_message_label()}
-								</FieldLabel>
-								<Textarea
-									id={field.name}
-									name={field.name}
-									value={field.state.value}
-									placeholder={m.rsvp_message_placeholder()}
-									onBlur={field.handleBlur}
-									onChange={(e) => field.handleChange(e.target.value)}
-									rows={3}
-								/>
-							</FieldContent>
-						</Field>
-					)}
-				</form.Field>
+				<div className="grid gap-5 sm:grid-cols-2">
+					{(
+						[
+							{
+								name: "company",
+								label: m.rsvp_company_label(),
+								placeholder: m.rsvp_company_placeholder(),
+								autoComplete: "organization",
+							},
+							{
+								name: "jobTitle",
+								label: m.rsvp_job_title_label(),
+								placeholder: m.rsvp_job_title_placeholder(),
+								autoComplete: "organization-title",
+							},
+							{
+								name: "phone",
+								label: m.rsvp_phone_label(),
+								placeholder: m.rsvp_phone_placeholder(),
+								autoComplete: "tel",
+								type: "tel",
+								validate: (value: string) =>
+									value.trim() && !PHONE_PATTERN.test(value.trim())
+										? m.rsvp_validation_phone_invalid()
+										: undefined,
+							},
+							{
+								name: "email",
+								label: m.rsvp_email_label(),
+								placeholder: m.rsvp_email_placeholder(),
+								autoComplete: "email",
+								type: "email",
+								validate: (value: string) =>
+									value.trim() && !EMAIL_PATTERN.test(value.trim())
+										? m.rsvp_validation_email_invalid()
+										: undefined,
+							},
+						] as const
+					).map((config) => (
+						<form.Field
+							key={config.name}
+							name={config.name}
+							validators={{
+								onBlur: ({ value }) =>
+									"validate" in config ? config.validate(value) : undefined,
+							}}
+						>
+							{(field) => (
+								<Field data-invalid={field.state.meta.errors.length > 0}>
+									<FieldContent>
+										<FieldLabel htmlFor={field.name}>{config.label}</FieldLabel>
+										<Input
+											id={field.name}
+											name={field.name}
+											type={"type" in config ? config.type : "text"}
+											autoComplete={config.autoComplete}
+											aria-invalid={field.state.meta.errors.length > 0}
+											value={field.state.value}
+											placeholder={config.placeholder}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+										/>
+										<FieldError
+											errors={field.state.meta.errors.map((message) => ({
+												message,
+											}))}
+										/>
+									</FieldContent>
+								</Field>
+							)}
+						</form.Field>
+					))}
+				</div>
 
 				<form.Field name="attending">
 					{(field) => (
@@ -212,50 +274,47 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 					)}
 				</form.Field>
 
-				<form.Subscribe selector={(state) => state.values.attending}>
-					{(attending) =>
-						attending === "yes" && (
-							<form.Field name="attendeeCount">
-								{(field) => (
-									<Field>
-										<FieldContent>
-											<FieldLabel htmlFor={field.name}>
-												{m.rsvp_count_label()}
-											</FieldLabel>
-											<Select
-												value={String(field.state.value)}
-												onValueChange={(value) =>
-													field.handleChange(Number(value))
-												}
-											>
-												<SelectTrigger
-													id={field.name}
-													className="w-full min-h-11"
-												>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent>
-													<SelectGroup>
-														{Array.from(
-															{ length: invitation.maxAttendees },
-															(_, i) => i + 1,
-														).map((total) => (
-															<SelectItem key={total} value={String(total)}>
-																{total === 1
-																	? m.rsvp_count_option_self()
-																	: m.rsvp_count_option({ count: total - 1 })}
-															</SelectItem>
-														))}
-													</SelectGroup>
-												</SelectContent>
-											</Select>
-										</FieldContent>
-									</Field>
-								)}
-							</form.Field>
-						)
-					}
-				</form.Subscribe>
+				<form.Field name="allergies">
+					{(field) => (
+						<Field>
+							<FieldContent>
+								<FieldLabel htmlFor={field.name}>
+									{m.rsvp_allergies_label()}
+								</FieldLabel>
+								<Textarea
+									id={field.name}
+									name={field.name}
+									value={field.state.value}
+									placeholder={m.rsvp_allergies_placeholder()}
+									onBlur={field.handleBlur}
+									onChange={(e) => field.handleChange(e.target.value)}
+									rows={2}
+								/>
+							</FieldContent>
+						</Field>
+					)}
+				</form.Field>
+
+				<form.Field name="message">
+					{(field) => (
+						<Field>
+							<FieldContent>
+								<FieldLabel htmlFor={field.name}>
+									{m.rsvp_message_label()}
+								</FieldLabel>
+								<Textarea
+									id={field.name}
+									name={field.name}
+									value={field.state.value}
+									placeholder={m.rsvp_message_placeholder()}
+									onBlur={field.handleBlur}
+									onChange={(e) => field.handleChange(e.target.value)}
+									rows={3}
+								/>
+							</FieldContent>
+						</Field>
+					)}
+				</form.Field>
 
 				{errorMessage && (
 					<p role="alert" className="text-sm font-medium text-(--coral)">

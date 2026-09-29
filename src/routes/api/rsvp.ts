@@ -6,7 +6,7 @@ import {
 	withApiErrorHandling,
 } from "#/lib/api-response";
 import { checkRateLimit, getClientIp } from "#/lib/rate-limit";
-import type { RsvpDto } from "#/lib/schemas";
+import { mapRsvpRow, RSVP_COLUMNS } from "#/lib/rsvp-mapper";
 import { rsvpSubmitSchema } from "#/lib/schemas";
 import { getSupabaseAdminClient } from "#/lib/supabase/admin";
 
@@ -27,8 +27,18 @@ async function handleSubmit(request: Request): Promise<Response> {
 			parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ",
 		);
 	}
-	const { code, responderName, message, attending, attendeeCount } =
-		parsed.data;
+	const {
+		code,
+		responderName,
+		company,
+		jobTitle,
+		phone,
+		email,
+		allergies,
+		message,
+		attending,
+		attendeeCount,
+	} = parsed.data;
 
 	const admin = getSupabaseAdminClient();
 	// `guest_id` always comes from this server-side lookup by invite code —
@@ -59,28 +69,25 @@ async function handleSubmit(request: Request): Promise<Response> {
 			{
 				guest_id: guest.id,
 				responder_name: responderName,
+				company: company || null,
+				job_title: jobTitle || null,
+				phone: phone || null,
+				email: email || null,
+				allergies: allergies || null,
 				message: message || null,
 				attending,
 				attendee_count: attending ? attendeeCount : 0,
 			},
 			{ onConflict: "guest_id" },
 		)
-		.select("responder_name, message, attending, attendee_count, updated_at")
+		.select(RSVP_COLUMNS)
 		.single();
 
 	if (error || !saved) {
 		throw new ApiError("INTERNAL_ERROR", "Không thể lưu phản hồi");
 	}
 
-	const body: RsvpDto = {
-		responderName: saved.responder_name,
-		message: saved.message,
-		attending: saved.attending,
-		attendeeCount: saved.attendee_count,
-		updatedAt: saved.updated_at,
-	};
-
-	return apiJsonResponse(body);
+	return apiJsonResponse(mapRsvpRow(saved));
 }
 
 export const Route = createFileRoute("/api/rsvp")({

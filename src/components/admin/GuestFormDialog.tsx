@@ -22,14 +22,6 @@ import {
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "#/components/ui/select";
 import { Textarea } from "#/components/ui/textarea";
 import {
 	useCreateGuestMutation,
@@ -54,7 +46,6 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 	const form = useForm({
 		defaultValues: {
 			fullName: guest?.fullName ?? "",
-			maxAttendees: guest?.maxAttendees ?? 5,
 			locale: guest?.locale ?? ("vi" as Locale),
 			note: guest?.note ?? "",
 		},
@@ -129,39 +120,6 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 							)}
 						</form.Field>
 
-						<form.Field name="maxAttendees">
-							{(field) => (
-								<Field>
-									<FieldContent>
-										<FieldLabel htmlFor={field.name}>
-											{m.admin_guest_max_attendees_label()}
-										</FieldLabel>
-										<Select
-											value={String(field.state.value)}
-											onValueChange={(value) =>
-												field.handleChange(Number(value))
-											}
-										>
-											<SelectTrigger id={field.name} className="w-full">
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectGroup>
-													{Array.from({ length: 10 }, (_, i) => i + 1).map(
-														(count) => (
-															<SelectItem key={count} value={String(count)}>
-																{count}
-															</SelectItem>
-														),
-													)}
-												</SelectGroup>
-											</SelectContent>
-										</Select>
-									</FieldContent>
-								</Field>
-							)}
-						</form.Field>
-
 						<form.Field name="locale">
 							{(field) => (
 								<FieldSet>
@@ -175,24 +133,20 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 										}
 										className="grid grid-cols-2 gap-3"
 									>
-										<div className="choice-option flex min-h-12 items-center gap-2 rounded-md border px-3 py-2">
+										<label
+											htmlFor="guest-locale-vi"
+											className="choice-option flex min-h-12 cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+										>
 											<RadioGroupItem value="vi" id="guest-locale-vi" />
-											<label
-												htmlFor="guest-locale-vi"
-												className="text-sm font-medium"
-											>
-												{m.admin_guest_locale_vi()}
-											</label>
-										</div>
-										<div className="choice-option flex min-h-12 items-center gap-2 rounded-md border px-3 py-2">
+											<span>{m.admin_guest_locale_vi()}</span>
+										</label>
+										<label
+											htmlFor="guest-locale-en"
+											className="choice-option flex min-h-12 cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+										>
 											<RadioGroupItem value="en" id="guest-locale-en" />
-											<label
-												htmlFor="guest-locale-en"
-												className="text-sm font-medium"
-											>
-												{m.admin_guest_locale_en()}
-											</label>
-										</div>
+											<span>{m.admin_guest_locale_en()}</span>
+										</label>
 									</RadioGroup>
 								</FieldSet>
 							)}

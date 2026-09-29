@@ -3,9 +3,14 @@ import ExcelJS from "exceljs";
 export interface GuestExportRow {
 	inviteCode: string;
 	fullName: string;
-	maxAttendees: number;
 	locale: string;
 	rsvp: {
+		responderName: string;
+		company: string | null;
+		jobTitle: string | null;
+		phone: string | null;
+		email: string | null;
+		allergies: string | null;
 		attending: boolean;
 		attendeeCount: number;
 		message: string | null;
@@ -22,10 +27,15 @@ export async function buildGuestXlsx(
 	sheet.columns = [
 		{ header: "Mã mời", key: "inviteCode", width: 14 },
 		{ header: "Họ tên", key: "fullName", width: 24 },
-		{ header: "Số người tối đa", key: "maxAttendees", width: 16 },
 		{ header: "Ngôn ngữ", key: "locale", width: 10 },
+		{ header: "Người phản hồi", key: "responderName", width: 24 },
+		{ header: "Công ty", key: "company", width: 24 },
+		{ header: "Vị trí hiện tại", key: "jobTitle", width: 20 },
+		{ header: "Số điện thoại", key: "phone", width: 16 },
+		{ header: "Email", key: "email", width: 26 },
 		{ header: "Trạng thái", key: "status", width: 14 },
 		{ header: "Số người tham dự", key: "attendeeCount", width: 16 },
+		{ header: "Dị ứng / nhạy cảm", key: "allergies", width: 32 },
 		{ header: "Lời nhắn", key: "message", width: 32 },
 		{ header: "Cập nhật lúc", key: "updatedAt", width: 20 },
 	];
@@ -38,14 +48,20 @@ export async function buildGuestXlsx(
 		sheet.addRow({
 			inviteCode: row.inviteCode,
 			fullName: row.fullName,
-			maxAttendees: row.maxAttendees,
 			locale: row.locale,
+			responderName: row.rsvp?.responderName ?? "",
+			company: row.rsvp?.company ?? "",
+			jobTitle: row.rsvp?.jobTitle ?? "",
+			// Text, so Excel keeps leading zeros / `+84`.
+			phone: row.rsvp?.phone ?? "",
+			email: row.rsvp?.email ?? "",
 			status: row.rsvp
 				? row.rsvp.attending
 					? "Tham dự"
 					: "Từ chối"
 				: "Chưa phản hồi",
 			attendeeCount: row.rsvp?.attendeeCount ?? "",
+			allergies: row.rsvp?.allergies ?? "",
 			message: row.rsvp?.message ?? "",
 			// Ghi Date thật thay vì string đã format, để Excel nhận đúng kiểu dữ liệu ngày giờ
 			updatedAt: row.rsvp?.updatedAt ? new Date(row.rsvp.updatedAt) : "",

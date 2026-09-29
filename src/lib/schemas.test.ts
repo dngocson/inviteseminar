@@ -92,3 +92,37 @@ describe("guestCreateSchema", () => {
 		).toThrow();
 	});
 });
+
+describe("rsvpSubmitSchema contact fields", () => {
+	const base = {
+		code: "Ab3x9Q2m",
+		responderName: "Nguyen Van A",
+		attending: false,
+	};
+
+	it("defaults every contact field to an empty string", () => {
+		const result = rsvpSubmitSchema.parse(base);
+		expect(result).toMatchObject({
+			company: "",
+			jobTitle: "",
+			phone: "",
+			email: "",
+			allergies: "",
+		});
+	});
+
+	it("accepts well-formed phone numbers and emails", () => {
+		for (const phone of ["0912345678", "+84 912 345 678", "(028) 3822-1234"]) {
+			expect(() =>
+				rsvpSubmitSchema.parse({ ...base, phone, email: "a@b.co" }),
+			).not.toThrow();
+		}
+	});
+
+	it("rejects a malformed phone number or email", () => {
+		expect(() => rsvpSubmitSchema.parse({ ...base, phone: "abc" })).toThrow();
+		expect(() =>
+			rsvpSubmitSchema.parse({ ...base, email: "not-an-email" }),
+		).toThrow();
+	});
+});
