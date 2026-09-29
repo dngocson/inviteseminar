@@ -7,6 +7,7 @@ import {
 } from "#/lib/api-response";
 import { isValidInviteCodeFormat } from "#/lib/invite-code";
 import { checkRateLimit, getClientIp } from "#/lib/rate-limit";
+import { mapRsvpRow, RSVP_COLUMNS } from "#/lib/rsvp-mapper";
 import type { InvitationDto } from "#/lib/schemas";
 import { getSupabaseAdminClient } from "#/lib/supabase/admin";
 
@@ -47,9 +48,7 @@ export const Route = createFileRoute("/api/invitations/$code")({
 
 				const { data: rsvp, error: rsvpError } = await admin
 					.from("rsvps")
-					.select(
-						"responder_name, message, attending, attendee_count, updated_at",
-					)
+					.select(RSVP_COLUMNS)
 					.eq("guest_id", guest.id)
 					.maybeSingle();
 
@@ -60,15 +59,7 @@ export const Route = createFileRoute("/api/invitations/$code")({
 				const body: InvitationDto = {
 					fullName: guest.full_name,
 					maxAttendees: guest.max_attendees,
-					rsvp: rsvp
-						? {
-								responderName: rsvp.responder_name,
-								message: rsvp.message,
-								attending: rsvp.attending,
-								attendeeCount: rsvp.attendee_count,
-								updatedAt: rsvp.updated_at,
-							}
-						: null,
+					rsvp: rsvp ? mapRsvpRow(rsvp) : null,
 				};
 
 				return apiJsonResponse(body);
