@@ -91,8 +91,8 @@ export const eventConfig = {
 				en: "Break Time",
 			},
 			description: {
-				vi: "Thời gian nghỉ giải lao và giao lưu cùng khách mời.",
-				en: "A short break and networking with guests.",
+				vi: "",
+				en: "",
 			},
 		},
 		{
