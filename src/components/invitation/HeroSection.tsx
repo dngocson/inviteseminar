@@ -58,6 +58,28 @@ export function HeroSection({
 			id="event"
 			className="invitation-hero relative isolate flex flex-col justify-center overflow-hidden px-6 pb-10 sm:px-10 sm:pb-14"
 		>
+			{/* Logo */}
+			{/* Two equal `1fr` columns: both take the wider side's width, so the
+			    divider sits exactly in the middle of the lockup. */}
+			<div className="absolute top-4 left-1/2 z-12 grid -translate-x-1/2 grid-cols-[1fr_auto_1fr] items-center gap-2.5 whitespace-nowrap sm:top-6 sm:gap-3 lg:gap-4">
+				<div className="flex flex-col justify-self-end">
+					<p className="text-sm font-extrabold leading-tight text-white sm:text-base lg:text-lg">
+						Dermatech
+					</p>
+					<span className="self-end text-[8px] leading-tight text-white sm:text-[10px] lg:text-xs">
+						Vietnam
+					</span>
+				</div>
+				<span
+					aria-hidden="true"
+					className="h-6 w-px shrink-0 bg-white sm:h-8 lg:h-9"
+				/>
+				<img
+					src="/gobiotics.png"
+					alt="Gobiotics"
+					className="h-auto w-20 -translate-y-1 lg:-translate-y-1.25 justify-self-start sm:w-24 lg:w-28"
+				/>
+			</div>
 			<img
 				src="/8.png"
 				alt=""
@@ -66,7 +88,7 @@ export function HeroSection({
 			/>
 			{/* Lớp phủ tối nhẹ để chữ luôn nổi trên ảnh nền */}
 			<div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#1a1530]/40 via-[#1a1530]/10 to-[#1a1530]/50" />
-			<div className="relative z-10 mx-auto w-full max-w-7xl">
+			<div className="relative z-10 mx-auto w-full max-w-7xl pt-6 lg:pt-12">
 				<motion.div
 					className="hero-copy mx-auto w-full text-center"
 					variants={container}
