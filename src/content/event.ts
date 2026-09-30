@@ -69,8 +69,8 @@ export const eventConfig = {
 				en: "Seating & Opening",
 			},
 			description: {
-				vi: "Ổn định chỗ ngồi, giới thiệu và phần mở đầu",
-				en: "Seating, Introductions & Opening Remarks",
+				vi: "",
+				en: "",
 			},
 		},
 		{
@@ -113,8 +113,8 @@ export const eventConfig = {
 				en: "Q&A & Networking – Group Photos & Closing",
 			},
 			description: {
-				vi: "Giao lưu, trao đổi cùng diễn giả và khách mời, sau đó bế mạc chương trình.",
-				en: "Networking and discussion with the speaker and guests, followed by the closing of the program.",
+				vi: "",
+				en: "",
 			},
 		},
 		{
@@ -124,8 +124,8 @@ export const eventConfig = {
 				en: "Break & Lunch",
 			},
 			description: {
-				vi: "Dùng bữa trưa thân mật và tiếp tục giao lưu cùng khách mời.",
-				en: "Enjoy a casual lunch and continue networking with guests.",
+				vi: "",
+				en: "",
 			},
 		},
 	] as TimelineItem[],
