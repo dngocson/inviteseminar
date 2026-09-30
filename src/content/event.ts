@@ -58,8 +58,8 @@ export const eventConfig = {
 				en: "Guest Reception & Check-in",
 			},
 			description: {
-				vi: "Đón khách, check-in và ổn định chỗ ngồi trước khi chương trình bắt đầu.",
-				en: "Guest check-in and seating before the program begins.",
+				vi: "",
+				en: "",
 			},
 		},
 		{
@@ -87,7 +87,7 @@ export const eventConfig = {
 		{
 			time: "10:30",
 			title: {
-				vi: "Giải lao",
+				vi: "Nghỉ giữa giờ",
 				en: "Break Time",
 			},
 			description: {
@@ -109,8 +109,8 @@ export const eventConfig = {
 		{
 			time: "11:50",
 			title: {
-				vi: "Giao lưu & Bế mạc",
-				en: "Networking & Closing",
+				vi: "Giao lưu hỏi đáp - chụp hình kỉ niệm kết thúc",
+				en: "Q&A & Networking – Group Photos & Closing",
 			},
 			description: {
 				vi: "Giao lưu, trao đổi cùng diễn giả và khách mời, sau đó bế mạc chương trình.",
@@ -120,8 +120,8 @@ export const eventConfig = {
 		{
 			time: "12:15",
 			title: {
-				vi: "Tiệc trưa thân mật",
-				en: "Casual Lunch",
+				vi: "Thời gian nghỉ ngơi và thưởng thức bữa trưa",
+				en: "Break & Lunch",
 			},
 			description: {
 				vi: "Dùng bữa trưa thân mật và tiếp tục giao lưu cùng khách mời.",
