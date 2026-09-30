@@ -5,6 +5,12 @@ export const env = createEnv({
 	server: {
 		SERVER_URL: z.string().url().optional(),
 		SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+		// Invitation emails (Resend). Optional so the app still runs without
+		// them; the "send invite" action reports a clear error instead.
+		RESEND_API_KEY: z.string().min(1).optional(),
+		// e.g. `Dermatech Vietnam <invite@your-domain.com>` — a verified domain.
+		INVITE_FROM_EMAIL: z.string().min(1).optional(),
+		INVITE_REPLY_TO: z.email().optional(),
 	},
 
 	/**
@@ -29,6 +35,9 @@ export const env = createEnv({
 	runtimeEnv: {
 		SERVER_URL: process.env.SERVER_URL,
 		SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+		RESEND_API_KEY: process.env.RESEND_API_KEY,
+		INVITE_FROM_EMAIL: process.env.INVITE_FROM_EMAIL,
+		INVITE_REPLY_TO: process.env.INVITE_REPLY_TO,
 		VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
 		VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
 		VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,

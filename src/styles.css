@@ -395,6 +395,14 @@ code {
 
 .admin-guest-table td {
   padding-block: 1rem;
+  /* The base TableCell is nowrap; let long emails / notes wrap instead of
+     forcing the whole table into horizontal scroll. */
+  white-space: normal;
+  vertical-align: top;
+}
+
+.admin-guest-table td.cell-nowrap {
+  white-space: nowrap;
 }
 
 .admin-guest-table th:first-child,

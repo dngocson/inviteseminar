@@ -22,6 +22,7 @@ import { Route as ApiAdminStatsRouteImport } from './routes/api/admin/stats'
 import { Route as ApiInvitationsCodeRouteImport } from './routes/api/invitations.$code'
 import { Route as ApiAdminGuestsIdRouteImport } from './routes/api/admin/guests.$id'
 import { Route as ApiAdminGuestsIdRegenerateRouteImport } from './routes/api/admin/guests.$id.regenerate'
+import { Route as ApiAdminGuestsIdSendInviteRouteImport } from './routes/api/admin/guests.$id.send-invite'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -89,6 +90,12 @@ const ApiAdminGuestsIdRegenerateRoute =
     path: '/regenerate',
     getParentRoute: () => ApiAdminGuestsIdRoute,
   } as any)
+const ApiAdminGuestsIdSendInviteRoute =
+  ApiAdminGuestsIdSendInviteRouteImport.update({
+    id: '/send-invite',
+    path: '/send-invite',
+    getParentRoute: () => ApiAdminGuestsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/api/invitations/$code': typeof ApiInvitationsCodeRoute
   '/api/admin/guests/$id': typeof ApiAdminGuestsIdRouteWithChildren
   '/api/admin/guests/$id/regenerate': typeof ApiAdminGuestsIdRegenerateRoute
+  '/api/admin/guests/$id/send-invite': typeof ApiAdminGuestsIdSendInviteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -119,6 +127,7 @@ export interface FileRoutesByTo {
   '/api/invitations/$code': typeof ApiInvitationsCodeRoute
   '/api/admin/guests/$id': typeof ApiAdminGuestsIdRouteWithChildren
   '/api/admin/guests/$id/regenerate': typeof ApiAdminGuestsIdRegenerateRoute
+  '/api/admin/guests/$id/send-invite': typeof ApiAdminGuestsIdSendInviteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -135,6 +144,7 @@ export interface FileRoutesById {
   '/api/invitations/$code': typeof ApiInvitationsCodeRoute
   '/api/admin/guests/$id': typeof ApiAdminGuestsIdRouteWithChildren
   '/api/admin/guests/$id/regenerate': typeof ApiAdminGuestsIdRegenerateRoute
+  '/api/admin/guests/$id/send-invite': typeof ApiAdminGuestsIdSendInviteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/api/invitations/$code'
     | '/api/admin/guests/$id'
     | '/api/admin/guests/$id/regenerate'
+    | '/api/admin/guests/$id/send-invite'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/api/invitations/$code'
     | '/api/admin/guests/$id'
     | '/api/admin/guests/$id/regenerate'
+    | '/api/admin/guests/$id/send-invite'
   id:
     | '__root__'
     | '/'
@@ -182,6 +194,7 @@ export interface FileRouteTypes {
     | '/api/invitations/$code'
     | '/api/admin/guests/$id'
     | '/api/admin/guests/$id/regenerate'
+    | '/api/admin/guests/$id/send-invite'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -291,15 +304,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminGuestsIdRegenerateRouteImport
       parentRoute: typeof ApiAdminGuestsIdRoute
     }
+    '/api/admin/guests/$id/send-invite': {
+      id: '/api/admin/guests/$id/send-invite'
+      path: '/send-invite'
+      fullPath: '/api/admin/guests/$id/send-invite'
+      preLoaderRoute: typeof ApiAdminGuestsIdSendInviteRouteImport
+      parentRoute: typeof ApiAdminGuestsIdRoute
+    }
   }
 }
 
 interface ApiAdminGuestsIdRouteChildren {
   ApiAdminGuestsIdRegenerateRoute: typeof ApiAdminGuestsIdRegenerateRoute
+  ApiAdminGuestsIdSendInviteRoute: typeof ApiAdminGuestsIdSendInviteRoute
 }
 
 const ApiAdminGuestsIdRouteChildren: ApiAdminGuestsIdRouteChildren = {
   ApiAdminGuestsIdRegenerateRoute: ApiAdminGuestsIdRegenerateRoute,
+  ApiAdminGuestsIdSendInviteRoute: ApiAdminGuestsIdSendInviteRoute,
 }
 
 const ApiAdminGuestsIdRouteWithChildren =

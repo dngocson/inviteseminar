@@ -1,4 +1,5 @@
 import { CircleAlert, RefreshCw } from "lucide-react";
+import type { ReactNode } from "react";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -20,6 +21,9 @@ interface ConfirmDialogProps {
 	onConfirm: () => void;
 	isPending?: boolean;
 	destructive?: boolean;
+	icon?: ReactNode;
+	/** Extra content between the description and the buttons (e.g. options). */
+	children?: ReactNode;
 }
 
 export function ConfirmDialog({
@@ -30,6 +34,8 @@ export function ConfirmDialog({
 	onConfirm,
 	isPending,
 	destructive,
+	icon,
+	children,
 }: ConfirmDialogProps) {
 	const m = useMessages();
 	return (
@@ -37,15 +43,17 @@ export function ConfirmDialog({
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogMedia>
-						{destructive ? (
-							<CircleAlert aria-hidden="true" />
-						) : (
-							<RefreshCw aria-hidden="true" />
-						)}
+						{icon ??
+							(destructive ? (
+								<CircleAlert aria-hidden="true" />
+							) : (
+								<RefreshCw aria-hidden="true" />
+							))}
 					</AlertDialogMedia>
 					<AlertDialogTitle>{title}</AlertDialogTitle>
 					<AlertDialogDescription>{description}</AlertDialogDescription>
 				</AlertDialogHeader>
+				{children}
 				<AlertDialogFooter>
 					<AlertDialogCancel>{m.admin_cancel()}</AlertDialogCancel>
 					<AlertDialogAction

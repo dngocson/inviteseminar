@@ -28,6 +28,12 @@ export const maxAttendeesSchema = z.number().int().min(1).max(10);
 // Internal admin note about a guest — never surfaced on the invitation card.
 export const guestNoteSchema = z.string().trim().max(1000);
 
+// Where the invitation email is sent. Empty string = no email on file.
+export const guestEmailSchema = z.union([
+	z.literal(""),
+	z.string().trim().pipe(z.email()),
+]);
+
 export const guestCreateSchema = z.object({
 	fullName: z.string().trim().min(1).max(200),
 	maxAttendees: maxAttendeesSchema.default(5),
@@ -36,6 +42,7 @@ export const guestCreateSchema = z.object({
 	// on the card itself; this just picks which one they land on.
 	locale: localeSchema.default("vi"),
 	note: guestNoteSchema.optional().default(""),
+	email: guestEmailSchema.optional().default(""),
 });
 // Request body shape: fields with a schema default (e.g. maxAttendees) may be omitted.
 export type GuestCreateInput = z.input<typeof guestCreateSchema>;
@@ -45,6 +52,7 @@ export const guestUpdateSchema = z.object({
 	maxAttendees: maxAttendeesSchema.optional(),
 	locale: localeSchema.optional(),
 	note: guestNoteSchema.optional(),
+	email: guestEmailSchema.optional(),
 });
 export type GuestUpdateInput = z.infer<typeof guestUpdateSchema>;
 
@@ -55,6 +63,9 @@ export const guestDto = z.object({
 	maxAttendees: maxAttendeesSchema,
 	locale: localeSchema,
 	note: z.string().nullable(),
+	email: z.string().nullable(),
+	inviteSentAt: z.iso.datetime().nullable(),
+	inviteSendError: z.string().nullable(),
 	createdAt: z.iso.datetime(),
 	updatedAt: z.iso.datetime(),
 });

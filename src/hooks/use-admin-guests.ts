@@ -6,6 +6,7 @@ import type {
 	GuestCreateInput,
 	GuestUpdateInput,
 	GuestWithRsvpDto,
+	Locale,
 	RsvpStatsDto,
 } from "#/lib/schemas";
 
@@ -74,5 +75,18 @@ export function useRegenerateInviteCodeMutation() {
 				method: "POST",
 			}),
 		onSuccess: invalidate,
+	});
+}
+
+export function useSendInviteEmailMutation() {
+	const invalidate = useInvalidateGuestData();
+	return useMutation({
+		mutationFn: ({ id, locale }: { id: string; locale: Locale }) =>
+			apiFetch<GuestWithRsvpDto>(`/api/admin/guests/${id}/send-invite`, {
+				method: "POST",
+				body: JSON.stringify({ locale }),
+			}),
+		// A failed send is recorded on the guest row too, so refresh either way.
+		onSettled: invalidate,
 	});
 }

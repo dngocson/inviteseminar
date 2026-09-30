@@ -1,5 +1,6 @@
 import {
 	Copy,
+	Mail,
 	MoreHorizontal,
 	Pencil,
 	QrCode,
@@ -22,7 +23,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "#/components/ui/dropdown-menu";
+import { FieldLegend, FieldSet } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
 import {
 	Select,
 	SelectContent,
@@ -42,9 +45,11 @@ import {
 import {
 	useDeleteGuestMutation,
 	useRegenerateInviteCodeMutation,
+	useSendInviteEmailMutation,
 } from "#/hooks/use-admin-guests";
+import { inviteEmailSubject } from "#/lib/email/invite-email";
 import { useMessages } from "#/lib/locale";
-import type { GuestWithRsvpDto } from "#/lib/schemas";
+import type { GuestWithRsvpDto, Locale } from "#/lib/schemas";
 import { m } from "#/paraglide/messages";
 
 type StatusFilter = "all" | "attending" | "declined" | "pending";
@@ -88,12 +93,49 @@ async function copyLink(url: string) {
 	}
 }
 
+/** Free-text column: wraps up to 3 lines, full text on hover. */
+function ClampedCell({ text }: { text: string | null | undefined }) {
+	return (
+		<TableCell
+			className="min-w-32 max-w-56 text-muted-foreground"
+			title={text || undefined}
+		>
+			<span className="line-clamp-3 break-words">{text || "—"}</span>
+		</TableCell>
+	);
+}
+
+/** Guest email + whether the invitation email went out. */
+function InviteEmailStatus({ guest }: { guest: GuestWithRsvpDto }) {
+	const m = useMessages();
+	if (!guest.email) return null;
+	return (
+		<span className="mt-0.5 flex flex-col text-xs font-normal">
+			<span className="break-all text-muted-foreground">{guest.email}</span>
+			{guest.inviteSendError ? (
+				<span className="text-destructive" title={guest.inviteSendError}>
+					{m.admin_invite_email_failed()}
+				</span>
+			) : guest.inviteSentAt ? (
+				<span className="text-emerald-700 dark:text-emerald-400">
+					{m.admin_invite_email_sent({
+						time: new Date(guest.inviteSentAt).toLocaleString(),
+					})}
+				</span>
+			) : null}
+		</span>
+	);
+}
+
 function RowActions({ guest }: { guest: GuestWithRsvpDto }) {
 	const m = useMessages();
 	const [confirmDelete, setConfirmDelete] = useState(false);
 	const [confirmRegenerate, setConfirmRegenerate] = useState(false);
+	const [confirmSend, setConfirmSend] = useState(false);
+	const [sendLocale, setSendLocale] = useState<Locale>(guest.locale);
 	const deleteMutation = useDeleteGuestMutation();
 	const regenerateMutation = useRegenerateInviteCodeMutation();
+	const sendMutation = useSendInviteEmailMutation();
 
 	return (
 		<div className="flex items-center justify-end gap-1">
@@ -135,6 +177,18 @@ function RowActions({ guest }: { guest: GuestWithRsvpDto }) {
 								</DropdownMenuItem>
 							}
 						/>
+						<DropdownMenuItem
+							disabled={!guest.email}
+							onSelect={() => {
+								setSendLocale(guest.locale);
+								setConfirmSend(true);
+							}}
+						>
+							<Mail />{" "}
+							{guest.inviteSentAt
+								? m.admin_resend_invite_email()
+								: m.admin_send_invite_email()}
+						</DropdownMenuItem>
 						<DropdownMenuItem onSelect={() => setConfirmRegenerate(true)}>
 							<RefreshCw /> {m.admin_regenerate_code()}
 						</DropdownMenuItem>
@@ -149,6 +203,71 @@ function RowActions({ guest }: { guest: GuestWithRsvpDto }) {
 				</DropdownMenuContent>
 			</DropdownMenu>
 
+			<ConfirmDialog
+				open={confirmSend}
+				onOpenChange={setConfirmSend}
+				title={
+					guest.inviteSentAt
+						? m.admin_resend_invite_email()
+						: m.admin_send_invite_email()
+				}
+				description={m.admin_send_invite_confirm_body({
+					name: guest.fullName,
+					email: guest.email ?? "",
+				})}
+				icon={<Mail aria-hidden="true" />}
+				isPending={sendMutation.isPending}
+				onConfirm={() =>
+					sendMutation.mutate(
+						{ id: guest.id, locale: sendLocale },
+						{
+							onSuccess: () => {
+								setConfirmSend(false);
+								toast.success(m.admin_send_invite_success());
+							},
+							onError: (error) => {
+								setConfirmSend(false);
+								toast.error(error.message || m.admin_error_generic());
+							},
+						},
+					)
+				}
+			>
+				<FieldSet>
+					<FieldLegend variant="label">
+						{m.admin_send_invite_language_label()}
+					</FieldLegend>
+					<RadioGroup
+						value={sendLocale}
+						onValueChange={(value) => setSendLocale(value as Locale)}
+						className="grid grid-cols-2 gap-3"
+					>
+						{(["vi", "en"] as const).map((option) => (
+							<label
+								key={option}
+								htmlFor={`send-locale-${guest.id}-${option}`}
+								className="choice-option flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+							>
+								<RadioGroupItem
+									value={option}
+									id={`send-locale-${guest.id}-${option}`}
+								/>
+								<span>
+									{option === "vi"
+										? m.admin_guest_locale_vi()
+										: m.admin_guest_locale_en()}
+								</span>
+							</label>
+						))}
+					</RadioGroup>
+					<p className="text-xs text-muted-foreground">
+						{m.admin_send_invite_subject_preview()}{" "}
+						<span className="font-medium text-foreground">
+							{inviteEmailSubject(sendLocale)}
+						</span>
+					</p>
+				</FieldSet>
+			</ConfirmDialog>
 			<ConfirmDialog
 				open={confirmRegenerate}
 				onOpenChange={setConfirmRegenerate}
@@ -249,7 +368,7 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 			) : (
 				<>
 					{/* Desktop table */}
-					<div className="admin-guest-table hidden overflow-hidden border-y bg-card md:block">
+					<div className="admin-guest-table hidden overflow-hidden border-y bg-card lg:block">
 						<Table>
 							<TableHeader>
 								<TableRow className="hover:bg-transparent">
@@ -271,45 +390,37 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 							<TableBody>
 								{filtered.map((guest) => (
 									<TableRow key={guest.id}>
-										<TableCell className="font-medium">
+										<TableCell className="min-w-40 max-w-60 font-medium">
 											{guest.fullName}
+											<InviteEmailStatus guest={guest} />
 										</TableCell>
-										<TableCell className="text-muted-foreground">
+										<TableCell className="min-w-28 max-w-44 text-muted-foreground">
 											{guest.rsvp?.responderName || "—"}
 										</TableCell>
-										<TableCell className="max-w-56 text-xs text-muted-foreground">
+										<TableCell className="min-w-44 max-w-60 text-xs text-muted-foreground">
 											<ContactDetails rsvp={guest.rsvp} />
 										</TableCell>
-										<TableCell className="font-mono text-xs text-muted-foreground">
+										<TableCell className="cell-nowrap font-mono text-xs text-muted-foreground">
 											{guest.inviteCode}
 											<span className="ml-1 font-sans uppercase">
 												({guest.locale})
 											</span>
 										</TableCell>
-										<TableCell>
+										<TableCell className="cell-nowrap">
 											<StatusBadge status={guestStatus(guest)} />
 										</TableCell>
 										<TableCell className="tabular-nums">
 											{guest.rsvp?.attendeeCount ?? "—"}
 										</TableCell>
-										<TableCell
-											className="max-w-48 truncate text-muted-foreground"
-											title={guest.rsvp?.allergies ?? undefined}
-										>
-											{guest.rsvp?.allergies || "—"}
-										</TableCell>
-										<TableCell className="max-w-48 truncate text-muted-foreground">
-											{guest.rsvp?.message || "—"}
-										</TableCell>
-										<TableCell className="max-w-48 truncate text-muted-foreground">
-											{guest.note || "—"}
-										</TableCell>
-										<TableCell className="text-xs text-muted-foreground">
+										<ClampedCell text={guest.rsvp?.allergies} />
+										<ClampedCell text={guest.rsvp?.message} />
+										<ClampedCell text={guest.note} />
+										<TableCell className="w-28 text-xs text-muted-foreground">
 											{new Date(
 												guest.rsvp?.updatedAt ?? guest.updatedAt,
 											).toLocaleString()}
 										</TableCell>
-										<TableCell>
+										<TableCell className="cell-nowrap">
 											<RowActions guest={guest} />
 										</TableCell>
 									</TableRow>
@@ -319,12 +430,13 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 					</div>
 
 					{/* Mobile list */}
-					<div className="flex flex-col gap-3 md:hidden">
+					<div className="flex flex-col gap-3 lg:hidden">
 						{filtered.map((guest) => (
 							<div key={guest.id} className="rounded-lg border bg-card p-5">
 								<div className="flex items-start justify-between gap-2">
 									<div className="min-w-0">
 										<p className="break-words font-medium">{guest.fullName}</p>
+										<InviteEmailStatus guest={guest} />
 										<p className="font-mono text-xs text-muted-foreground">
 											{guest.inviteCode} ({guest.locale.toUpperCase()})
 										</p>

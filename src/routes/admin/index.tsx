@@ -33,7 +33,7 @@ function AdminDashboard() {
 	const guestsQuery = useAdminGuestsQuery(true);
 	const statsQuery = useAdminStatsQuery(true);
 	return (
-		<div className="admin-workspace mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 sm:px-8 sm:py-10">
+		<div className="admin-workspace mx-auto flex w-full flex-col gap-8 px-4 py-6 sm:px-8 sm:py-10">
 			<AdminHeader email={adminEmail} />
 
 			<StatsGrid stats={statsQuery.data} />
@@ -80,7 +80,7 @@ function AdminDashboard() {
 					<GuestDataView guests={guestsQuery.data} />
 				)}
 			</section>
-			<div className="w-screen h-screen"></div>
+			<div className="h-screen w-full" />
 		</div>
 	);
 }

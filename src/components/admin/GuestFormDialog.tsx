@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { LoaderCircle, Save, UserRound } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -25,11 +26,14 @@ import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
 import { Textarea } from "#/components/ui/textarea";
 import {
 	useCreateGuestMutation,
+	useSendInviteEmailMutation,
 	useUpdateGuestMutation,
 } from "#/hooks/use-admin-guests";
 import { ApiRequestError } from "#/lib/api-client";
 import { useMessages } from "#/lib/locale";
 import type { GuestWithRsvpDto, Locale } from "#/lib/schemas";
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface GuestFormDialogProps {
 	trigger: ReactNode;
@@ -41,19 +45,36 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 	const [open, setOpen] = useState(false);
 	const createMutation = useCreateGuestMutation();
 	const updateMutation = useUpdateGuestMutation();
+	const sendInviteMutation = useSendInviteEmailMutation();
 	const mutation = guest ? updateMutation : createMutation;
 
 	const form = useForm({
 		defaultValues: {
 			fullName: guest?.fullName ?? "",
+			email: guest?.email ?? "",
 			locale: guest?.locale ?? ("vi" as Locale),
 			note: guest?.note ?? "",
+			// Create only: email the invitation right after the guest is saved.
+			sendInvite: false,
 		},
 		onSubmit: async ({ value }) => {
+			const { sendInvite, ...input } = value;
 			if (guest) {
-				await updateMutation.mutateAsync({ id: guest.id, ...value });
+				await updateMutation.mutateAsync({ id: guest.id, ...input });
 			} else {
-				await createMutation.mutateAsync(value);
+				const created = await createMutation.mutateAsync(input);
+				if (sendInvite && created.email) {
+					// The guest is saved either way; a failed send shows on its row
+					// and can be retried from the row menu.
+					sendInviteMutation.mutate(
+						{ id: created.id, locale: created.locale },
+						{
+							onSuccess: () => toast.success(m.admin_send_invite_success()),
+							onError: (error) =>
+								toast.error(error.message || m.admin_error_generic()),
+						},
+					);
+				}
 			}
 			setOpen(false);
 			form.reset();
@@ -120,6 +141,41 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 							)}
 						</form.Field>
 
+						<form.Field
+							name="email"
+							validators={{
+								onBlur: ({ value }) =>
+									value.trim() && !EMAIL_PATTERN.test(value.trim())
+										? m.admin_guest_email_invalid()
+										: undefined,
+							}}
+						>
+							{(field) => (
+								<Field data-invalid={field.state.meta.errors.length > 0}>
+									<FieldContent>
+										<FieldLabel htmlFor={field.name}>
+											{m.admin_guest_email_label()}
+										</FieldLabel>
+										<Input
+											id={field.name}
+											type="email"
+											autoComplete="off"
+											placeholder="name@company.com"
+											aria-invalid={field.state.meta.errors.length > 0}
+											value={field.state.value}
+											onChange={(e) => field.handleChange(e.target.value)}
+											onBlur={field.handleBlur}
+										/>
+										<FieldError
+											errors={field.state.meta.errors.map((message) => ({
+												message,
+											}))}
+										/>
+									</FieldContent>
+								</Field>
+							)}
+						</form.Field>
+
 						<form.Field name="locale">
 							{(field) => (
 								<FieldSet>
@@ -170,6 +226,40 @@ export function GuestFormDialog({ trigger, guest }: GuestFormDialogProps) {
 								</Field>
 							)}
 						</form.Field>
+
+						{!guest && (
+							<form.Subscribe selector={(state) => state.values.email.trim()}>
+								{(email) => (
+									<form.Field name="sendInvite">
+										{(field) => (
+											<label
+												htmlFor="guest-send-invite"
+												className="flex cursor-pointer items-start gap-3 rounded-md border px-3 py-3 text-sm has-disabled:cursor-not-allowed has-disabled:opacity-60"
+											>
+												<input
+													id="guest-send-invite"
+													type="checkbox"
+													className="mt-0.5 size-4 shrink-0 accent-primary"
+													disabled={!email}
+													checked={Boolean(email) && field.state.value}
+													onChange={(e) => field.handleChange(e.target.checked)}
+												/>
+												<span className="flex flex-col gap-0.5">
+													<span className="font-medium">
+														{m.admin_guest_send_invite_now()}
+													</span>
+													<span className="text-xs text-muted-foreground">
+														{email
+															? m.admin_guest_send_invite_now_hint()
+															: m.admin_guest_send_invite_now_needs_email()}
+													</span>
+												</span>
+											</label>
+										)}
+									</form.Field>
+								)}
+							</form.Subscribe>
+						)}
 
 						{mutation.error && (
 							<p role="alert" className="text-sm text-destructive">

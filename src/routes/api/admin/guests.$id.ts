@@ -52,6 +52,9 @@ export const Route = createFileRoute("/api/admin/guests/$id")({
 						...(parsed.data.note !== undefined && {
 							note: parsed.data.note || null,
 						}),
+						...(parsed.data.email !== undefined && {
+							email: parsed.data.email || null,
+						}),
 					})
 					.eq("id", id)
 					.select(GUEST_WITH_RSVP_SELECT)
