@@ -4,6 +4,7 @@ export interface GuestExportRow {
 	inviteCode: string;
 	fullName: string;
 	locale: string;
+	note: string | null;
 	rsvp: {
 		responderName: string;
 		company: string | null;
@@ -37,6 +38,7 @@ export async function buildGuestXlsx(
 		{ header: "Số người tham dự", key: "attendeeCount", width: 16 },
 		{ header: "Dị ứng / nhạy cảm", key: "allergies", width: 32 },
 		{ header: "Lời nhắn", key: "message", width: 32 },
+		{ header: "Ghi chú nội bộ", key: "note", width: 32 },
 		{ header: "Cập nhật lúc", key: "updatedAt", width: 20 },
 	];
 
@@ -63,6 +65,7 @@ export async function buildGuestXlsx(
 			attendeeCount: row.rsvp?.attendeeCount ?? "",
 			allergies: row.rsvp?.allergies ?? "",
 			message: row.rsvp?.message ?? "",
+			note: row.note ?? "",
 			// Ghi Date thật thay vì string đã format, để Excel nhận đúng kiểu dữ liệu ngày giờ
 			updatedAt: row.rsvp?.updatedAt ? new Date(row.rsvp.updatedAt) : "",
 		});

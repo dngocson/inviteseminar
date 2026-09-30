@@ -6,7 +6,7 @@ import { buildGuestXlsx } from "#/lib/guest-xlsx";
 import { mapRsvpRow, RSVP_COLUMNS, type RsvpRow } from "#/lib/rsvp-mapper";
 import { getSupabaseAdminClient } from "#/lib/supabase/admin";
 
-const GUEST_EXPORT_SELECT = `invite_code, full_name, locale, rsvp:rsvps(${RSVP_COLUMNS})`;
+const GUEST_EXPORT_SELECT = `invite_code, full_name, locale, note, rsvp:rsvps(${RSVP_COLUMNS})`;
 
 export const Route = createFileRoute("/api/admin/export")({
 	server: {
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/api/admin/export")({
 						inviteCode: row.invite_code,
 						fullName: row.full_name,
 						locale: row.locale,
+						note: row.note,
 						rsvp: rsvpRow && mapRsvpRow(rsvpRow),
 					};
 				});
