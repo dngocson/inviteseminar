@@ -36,6 +36,30 @@ const item = {
 	},
 };
 
+// Subtitle block: joins the hero stagger, then reveals its own lines one by one
+const subtitleGroup = {
+	hidden: {},
+	show: {
+		transition: {
+			staggerChildren: 0.18,
+		},
+	},
+};
+
+// Lead line: a slightly softer blur-in so it reads as the accent
+const subtitleLead = {
+	hidden: { opacity: 0, y: 14, filter: "blur(6px)" },
+	show: {
+		opacity: 1,
+		y: 0,
+		filter: "blur(0px)",
+		transition: {
+			duration: 0.8,
+			ease: [0.16, 1, 0.3, 1] as const,
+		},
+	},
+};
+
 export function HeroSection({
 	fullName,
 	seminarName,
@@ -140,12 +164,26 @@ export function HeroSection({
 						<span className="h-px flex-1 bg-gradient-to-l from-transparent to-[#d9a75c]/70" />
 					</motion.div>
 
-					<motion.p
-						variants={item}
-						className="mx-auto mt-6 max-w-xl text-center text-sm leading-relaxed text-[#b7bcd6]"
-					>
-						{m.hero_subtitle()}
-					</motion.p>
+					{locale === "en" ? (
+						<motion.p
+							variants={item}
+							className="mx-auto mt-6 max-w-xl text-center text-sm leading-relaxed text-[#b7bcd6]"
+						>
+							{m.hero_subtitle()}
+						</motion.p>
+					) : (
+						<motion.div
+							variants={subtitleGroup}
+							className="mx-auto mt-6 max-w-xl text-center text-sm leading-relaxed text-[#b7bcd6] display-title"
+						>
+							<motion.p variants={subtitleLead} className="font-bold text-xl">
+								Hơn cả Prebiotics:
+							</motion.p>
+							<motion.span variants={item} className="block">
+								Giải pháp đa chức năng cho mỹ phẩm hiện đại.
+							</motion.span>
+						</motion.div>
+					)}
 
 					<motion.div variants={item} className="flex justify-center">
 						<a

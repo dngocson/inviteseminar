@@ -21,6 +21,7 @@
   "hero_kicker": "You are cordially invited",
   "hero_greeting": "Dear {fullName}",
   "hero_title": "Join us for the seminar",
+  "hero_subtitle_lead": "",
   "hero_subtitle": "Join us to explore solutions for supporting and maintaining a balanced skin microbiome.",
 
   "schedule_kicker": "Date & Venue",

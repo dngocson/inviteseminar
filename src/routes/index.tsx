@@ -67,7 +67,7 @@ function EventContent({ locale }: { locale: "vi" | "en" }) {
 	return (
 		<InvitationShell locale={locale}>
 			<HeroSection
-				seminarName={localized(eventConfig.seminarName, locale)}
+				seminarName={localized(eventConfig.seminarName, "en")}
 				organizer={organizer}
 			/>
 
@@ -140,7 +140,7 @@ function InvitationContent({
 		);
 	}
 
-	const seminarName = localized(eventConfig.seminarName, locale);
+	const seminarName = localized(eventConfig.seminarName, "en");
 
 	const organizer = localized(eventConfig.organizer, locale);
 
