@@ -1,4 +1,4 @@
-import { useForm } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { CircleCheck, LoaderCircle, Pencil, Send } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -81,6 +81,13 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 		},
 	});
 
+	// Contact details are required only for guests who will attend.
+	const attendingYes = useStore(
+		form.store,
+		(s) => s.values.attending === "yes",
+	);
+	const submitted = useStore(form.store, (s) => s.submissionAttempts > 0);
+
 	if (mutation.isSuccess && submittedAttending !== null) {
 		return (
 			<motion.div
@@ -150,6 +157,9 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 							<FieldContent>
 								<FieldLabel htmlFor={field.name}>
 									{m.rsvp_name_label()}
+									<span aria-hidden="true" className="text-(--coral)">
+										*
+									</span>
 								</FieldLabel>
 								<Input
 									id={field.name}
@@ -178,12 +188,14 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 								label: m.rsvp_company_label(),
 								placeholder: m.rsvp_company_placeholder(),
 								autoComplete: "organization",
+								required: m.rsvp_validation_company_required(),
 							},
 							{
 								name: "jobTitle",
 								label: m.rsvp_job_title_label(),
 								placeholder: m.rsvp_job_title_placeholder(),
 								autoComplete: "organization-title",
+								required: m.rsvp_validation_job_title_required(),
 							},
 							{
 								name: "phone",
@@ -191,10 +203,9 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 								placeholder: m.rsvp_phone_placeholder(),
 								autoComplete: "tel",
 								type: "tel",
-								validate: (value: string) =>
-									value.trim() && !PHONE_PATTERN.test(value.trim())
-										? m.rsvp_validation_phone_invalid()
-										: undefined,
+								required: m.rsvp_validation_phone_required(),
+								pattern: PHONE_PATTERN,
+								invalid: m.rsvp_validation_phone_invalid(),
 							},
 							{
 								name: "email",
@@ -202,10 +213,9 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 								placeholder: m.rsvp_email_placeholder(),
 								autoComplete: "email",
 								type: "email",
-								validate: (value: string) =>
-									value.trim() && !EMAIL_PATTERN.test(value.trim())
-										? m.rsvp_validation_email_invalid()
-										: undefined,
+								required: m.rsvp_validation_email_required(),
+								pattern: EMAIL_PATTERN,
+								invalid: m.rsvp_validation_email_invalid(),
 							},
 						] as const
 					).map((config) => (
@@ -213,33 +223,59 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 							key={config.name}
 							name={config.name}
 							validators={{
-								onBlur: ({ value }) =>
-									"validate" in config ? config.validate(value) : undefined,
+								// Re-check when the attendance choice flips, so switching to
+								// "no" clears the required errors.
+								onChangeListenTo: ["attending"],
+								onChange: ({ value, fieldApi }) => {
+									const trimmed = value.trim();
+									if (!trimmed) {
+										return fieldApi.form.getFieldValue("attending") === "yes"
+											? config.required
+											: undefined;
+									}
+									return "pattern" in config && !config.pattern.test(trimmed)
+										? config.invalid
+										: undefined;
+								},
 							}}
 						>
-							{(field) => (
-								<Field data-invalid={field.state.meta.errors.length > 0}>
-									<FieldContent>
-										<FieldLabel htmlFor={field.name}>{config.label}</FieldLabel>
-										<Input
-											id={field.name}
-											name={field.name}
-											type={"type" in config ? config.type : "text"}
-											autoComplete={config.autoComplete}
-											aria-invalid={field.state.meta.errors.length > 0}
-											value={field.state.value}
-											placeholder={config.placeholder}
-											onBlur={field.handleBlur}
-											onChange={(e) => field.handleChange(e.target.value)}
-										/>
-										<FieldError
-											errors={field.state.meta.errors.map((message) => ({
-												message,
-											}))}
-										/>
-									</FieldContent>
-								</Field>
-							)}
+							{(field) => {
+								// Don't flag a field before the guest has left it or tried
+								// to submit.
+								const errors =
+									field.state.meta.isBlurred || submitted
+										? field.state.meta.errors
+										: [];
+								return (
+									<Field data-invalid={errors.length > 0}>
+										<FieldContent>
+											<FieldLabel htmlFor={field.name}>
+												{config.label}
+												{attendingYes && (
+													<span aria-hidden="true" className="text-(--coral)">
+														*
+													</span>
+												)}
+											</FieldLabel>
+											<Input
+												id={field.name}
+												name={field.name}
+												type={"type" in config ? config.type : "text"}
+												autoComplete={config.autoComplete}
+												aria-required={attendingYes}
+												aria-invalid={errors.length > 0}
+												value={field.state.value}
+												placeholder={config.placeholder}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+											/>
+											<FieldError
+												errors={errors.map((message) => ({ message }))}
+											/>
+										</FieldContent>
+									</Field>
+								);
+							}}
 						</form.Field>
 					))}
 				</div>

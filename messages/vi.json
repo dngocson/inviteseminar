@@ -68,6 +68,10 @@
   "rsvp_error_generic": "Không thể gửi phản hồi. Vui lòng thử lại.",
   "rsvp_error_network": "Lỗi kết nối mạng. Vui lòng kiểm tra đường truyền và thử lại.",
   "rsvp_validation_name_required": "Vui lòng nhập họ và tên",
+  "rsvp_validation_company_required": "Vui lòng nhập tên công ty",
+  "rsvp_validation_job_title_required": "Vui lòng nhập vị trí hiện tại",
+  "rsvp_validation_phone_required": "Vui lòng nhập số điện thoại",
+  "rsvp_validation_email_required": "Vui lòng nhập email",
   "rsvp_validation_phone_invalid": "Số điện thoại không hợp lệ",
   "rsvp_validation_email_invalid": "Email không hợp lệ",
 

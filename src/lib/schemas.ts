@@ -143,7 +143,21 @@ export const rsvpSubmitSchema = z
 			message: "attendeeCount must be 0 when declining, 1-10 when attending",
 			path: ["attendeeCount"],
 		},
-	);
+	)
+	// Attending guests must leave their contact details (the form enforces
+	// this too; this is the server-side guarantee).
+	.superRefine((data, ctx) => {
+		if (!data.attending) return;
+		const required = [
+			["company", "Vui lòng nhập tên công ty"],
+			["jobTitle", "Vui lòng nhập vị trí hiện tại"],
+			["phone", "Vui lòng nhập số điện thoại"],
+			["email", "Vui lòng nhập email"],
+		] as const;
+		for (const [key, message] of required) {
+			if (!data[key]) ctx.addIssue({ code: "custom", message, path: [key] });
+		}
+	});
 export type RsvpSubmitInput = z.infer<typeof rsvpSubmitSchema>;
 
 // ---------------------------------------------------------------------------

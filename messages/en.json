@@ -68,6 +68,10 @@
   "rsvp_error_generic": "Couldn't submit your response. Please try again.",
   "rsvp_error_network": "Network error. Please check your connection and try again.",
   "rsvp_validation_name_required": "Please enter your full name",
+  "rsvp_validation_company_required": "Please enter your company",
+  "rsvp_validation_job_title_required": "Please enter your current position",
+  "rsvp_validation_phone_required": "Please enter your phone number",
+  "rsvp_validation_email_required": "Please enter your email",
   "rsvp_validation_phone_invalid": "Please enter a valid phone number",
   "rsvp_validation_email_invalid": "Please enter a valid email address",
 

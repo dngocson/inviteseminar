@@ -35,7 +35,14 @@ describe("invitationSearchSchema", () => {
 });
 
 describe("rsvpSubmitSchema attendance/count consistency", () => {
-	const base = { code: "Ab3x9Q2m", responderName: "Nguyen Van A" };
+	const base = {
+		code: "Ab3x9Q2m",
+		responderName: "Nguyen Van A",
+		company: "Dermatech",
+		jobTitle: "Manager",
+		phone: "0912345678",
+		email: "a@b.co",
+	};
 
 	it("accepts attending=true with a count between 1 and 10", () => {
 		expect(() =>
@@ -124,5 +131,45 @@ describe("rsvpSubmitSchema contact fields", () => {
 		expect(() =>
 			rsvpSubmitSchema.parse({ ...base, email: "not-an-email" }),
 		).toThrow();
+	});
+});
+
+describe("rsvpSubmitSchema required contact details when attending", () => {
+	const base = { code: "Ab3x9Q2m", responderName: "Nguyen Van A" };
+	const contacts = {
+		company: "Dermatech",
+		jobTitle: "Manager",
+		phone: "0912345678",
+		email: "a@b.co",
+	};
+
+	it("requires company, position, phone and email to attend", () => {
+		const result = rsvpSubmitSchema.safeParse({
+			...base,
+			attending: true,
+			attendeeCount: 1,
+		});
+		expect(result.success).toBe(false);
+		const paths = result.error?.issues.map((issue) => issue.path[0]);
+		expect(paths).toEqual(
+			expect.arrayContaining(["company", "jobTitle", "phone", "email"]),
+		);
+	});
+
+	it("accepts an attending RSVP with every contact field filled", () => {
+		expect(() =>
+			rsvpSubmitSchema.parse({
+				...base,
+				...contacts,
+				attending: true,
+				attendeeCount: 1,
+			}),
+		).not.toThrow();
+	});
+
+	it("keeps contact details optional when declining", () => {
+		expect(() =>
+			rsvpSubmitSchema.parse({ ...base, attending: false }),
+		).not.toThrow();
 	});
 });
