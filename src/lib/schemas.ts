@@ -108,6 +108,9 @@ const optionalText = (max: number) =>
 export const rsvpSubmitSchema = z
 	.object({
 		code: inviteCodeSchema,
+		// Language the guest is viewing the card in; picks the confirmation
+		// email's language. Falls back to the guest's saved locale.
+		locale: localeSchema.optional(),
 		responderName: z.string().trim().min(1).max(200),
 		company: optionalText(200),
 		jobTitle: optionalText(200),

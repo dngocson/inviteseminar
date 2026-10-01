@@ -46,6 +46,23 @@ describe("buildInviteEmail", () => {
 		}
 	});
 
+	it("uses thank-you copy for the post-RSVP confirmation", () => {
+		const vi = buildInviteEmail({ ...base, kind: "confirmation" });
+		expect(vi.subject.startsWith("Xác nhận tham dự Hội thảo:")).toBe(true);
+		expect(vi.html).toContain("XÁC NHẬN THAM DỰ");
+		expect(vi.html).toContain('src="cid:invite-qr"');
+		expect(vi.html).not.toContain("THƯ MỜI");
+
+		const en = buildInviteEmail({
+			...base,
+			locale: "en",
+			kind: "confirmation",
+		});
+		expect(en.subject.startsWith("Attendance confirmed:")).toBe(true);
+		expect(en.html).toContain("Your check-in QR code");
+		expect(new URL(en.inviteUrl).searchParams.get("l")).toBe("en");
+	});
+
 	it("escapes guest-provided text", () => {
 		const email = buildInviteEmail({ ...base, guestName: "<b>x</b>" });
 		expect(email.html).toContain("&lt;b&gt;x&lt;/b&gt;");

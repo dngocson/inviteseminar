@@ -4,6 +4,8 @@ import type { Locale } from "#/lib/schemas";
 
 /**
  * Invitation email template (HTML + plain text), bilingual via `locale`.
+ * `kind: "confirmation"` reuses the same layout with thank-you copy, sent
+ * automatically when a guest who never got the invite RSVPs "attending".
  *
  * Email clients are not browsers: layout is table-based with inline styles
  * (no flexbox or external CSS), widths are fixed at 600px with a fluid
@@ -12,7 +14,11 @@ import type { Locale } from "#/lib/schemas";
  * tightens spacing on phones; clients that strip it still get a usable layout.
  */
 
+export type InviteEmailKind = "invite" | "confirmation";
+
 export interface InviteEmailInput {
+	/** Defaults to "invite". */
+	kind?: InviteEmailKind;
 	guestName: string;
 	/** Site origin + invite code; the link is built here with `locale` so the
 	 *  email copy and the invitation card it opens always share a language. */
@@ -96,6 +102,46 @@ const COPY = {
 	},
 } satisfies Record<Locale, unknown>;
 
+type Copy = (typeof COPY)[Locale];
+
+/** What changes for the post-RSVP confirmation; everything else is shared. */
+const CONFIRMATION_COPY = {
+	vi: {
+		subjectPrefix: "Xác nhận tham dự Hội thảo",
+		preheader:
+			"Cảm ơn Anh/Chị đã xác nhận tham dự. Thông tin sự kiện và mã QR check-in ở bên trong.",
+		kicker: "XÁC NHẬN THAM DỰ",
+		intro:
+			"Cảm ơn Anh/Chị đã xác nhận tham dự hội thảo. Dưới đây là thông tin sự kiện và mã QR dùng để check-in.",
+		cta: "Xem thiệp mời & cập nhật phản hồi",
+		qrTitle: "Mã QR check-in của Anh/Chị",
+		qrBody:
+			"Vui lòng xuất trình mã này tại quầy check-in. Anh/Chị cũng có thể quét mã để mở lại thiệp mời.",
+		footer:
+			"Email này được gửi tự động sau khi Anh/Chị xác nhận tham dự. Vui lòng không chuyển tiếp đường dẫn cho người khác.",
+	},
+	en: {
+		subjectPrefix: "Attendance confirmed",
+		preheader:
+			"Thank you for confirming your attendance. Event details and your check-in QR code are inside.",
+		kicker: "ATTENDANCE CONFIRMED",
+		intro:
+			"Thank you for confirming your attendance at our seminar. Below are the event details and your QR code for check-in.",
+		cta: "View invitation & update RSVP",
+		qrTitle: "Your check-in QR code",
+		qrBody:
+			"Please present this code at the check-in desk. You can also scan it to reopen your invitation.",
+		footer:
+			"This email was sent automatically after you confirmed your attendance. Please do not forward the link to others.",
+	},
+} satisfies Record<Locale, Partial<Copy>>;
+
+function copyFor(locale: Locale, kind: InviteEmailKind): Copy {
+	return kind === "confirmation"
+		? { ...COPY[locale], ...CONFIRMATION_COPY[locale] }
+		: COPY[locale];
+}
+
 export function escapeHtml(value: string): string {
 	return value
 		.replace(/&/g, "&amp;")
@@ -114,8 +160,11 @@ function seminarTitle(locale: Locale): string {
 }
 
 /** Subject line; also shown in the admin "send invite" dialog as a preview. */
-export function inviteEmailSubject(locale: Locale): string {
-	return `${COPY[locale].subjectPrefix}: ${seminarTitle(locale)}`;
+export function inviteEmailSubject(
+	locale: Locale,
+	kind: InviteEmailKind = "invite",
+): string {
+	return `${copyFor(locale, kind).subjectPrefix}: ${seminarTitle(locale)}`;
 }
 
 export function formatEventSchedule(locale: Locale): {
@@ -146,8 +195,9 @@ export function formatEventSchedule(locale: Locale): {
 
 export function buildInviteEmail(input: InviteEmailInput): InviteEmail {
 	const { guestName, origin, inviteCode, locale, qrCid, logoCid } = input;
+	const kind = input.kind ?? "invite";
 	const inviteUrl = buildInviteUrl(origin, inviteCode, locale);
-	const t = COPY[locale];
+	const t = copyFor(locale, kind);
 	const title = seminarTitle(locale);
 	const organizer = localized(eventConfig.organizer, locale);
 	const venueName = localized(eventConfig.venue.name, locale);
@@ -158,7 +208,7 @@ export function buildInviteEmail(input: InviteEmailInput): InviteEmail {
 		title: localized(item.title, locale),
 	}));
 
-	const subject = inviteEmailSubject(locale);
+	const subject = inviteEmailSubject(locale, kind);
 
 	const e = escapeHtml;
 	const url = e(inviteUrl);

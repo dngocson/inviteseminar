@@ -17,7 +17,7 @@ import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
 import { Textarea } from "#/components/ui/textarea";
 import { useSubmitRsvpMutation } from "#/hooks/use-invitation";
 import { ApiRequestError } from "#/lib/api-client";
-import { useMessages } from "#/lib/locale";
+import { useLocale, useMessages } from "#/lib/locale";
 import { type InvitationDto, PHONE_PATTERN } from "#/lib/schemas";
 
 // Same check `z.email()` applies server-side, loose enough for real addresses.
@@ -41,6 +41,7 @@ interface FormValues {
 
 export function RsvpForm({ code, invitation }: RsvpFormProps) {
 	const m = useMessages();
+	const locale = useLocale();
 	const [submittedAttending, setSubmittedAttending] = useState<boolean | null>(
 		invitation.rsvp ? invitation.rsvp.attending : null,
 	);
@@ -64,6 +65,7 @@ export function RsvpForm({ code, invitation }: RsvpFormProps) {
 		onSubmit: async ({ value }) => {
 			const attending = value.attending === "yes";
 			await mutation.mutateAsync({
+				locale,
 				responderName: value.responderName.trim(),
 				company: value.company.trim(),
 				jobTitle: value.jobTitle.trim(),

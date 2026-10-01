@@ -2,7 +2,10 @@ import QRCode from "qrcode";
 import { Resend } from "resend";
 
 import { env } from "#/env";
-import { buildInviteEmail } from "#/lib/email/invite-email";
+import {
+	buildInviteEmail,
+	type InviteEmailKind,
+} from "#/lib/email/invite-email";
 import type { Locale } from "#/lib/schemas";
 
 const QR_CID = "invite-qr";
@@ -11,6 +14,8 @@ const LOGO_CID = "gobiotics-logo";
 export class InviteEmailConfigError extends Error {}
 
 export interface SendInviteInput {
+	/** "invite" (admin) or "confirmation" (after an attending RSVP). */
+	kind?: InviteEmailKind;
 	to: string;
 	guestName: string;
 	inviteCode: string;
@@ -45,6 +50,7 @@ export async function sendInviteEmail(input: SendInviteInput): Promise<string> {
 	const logoPng = await fetchLogo(input.origin);
 
 	const email = buildInviteEmail({
+		kind: input.kind,
 		guestName: input.guestName,
 		origin: input.origin,
 		inviteCode: input.inviteCode,

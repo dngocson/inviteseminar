@@ -5,6 +5,7 @@ import {
 	apiJsonResponse,
 	withApiErrorHandling,
 } from "#/lib/api-response";
+import { sendRsvpConfirmationIfNeeded } from "#/lib/email/rsvp-confirmation";
 import { checkRateLimit, getClientIp } from "#/lib/rate-limit";
 import { mapRsvpRow, RSVP_COLUMNS } from "#/lib/rsvp-mapper";
 import { rsvpSubmitSchema } from "#/lib/schemas";
@@ -29,6 +30,7 @@ async function handleSubmit(request: Request): Promise<Response> {
 	}
 	const {
 		code,
+		locale,
 		responderName,
 		company,
 		jobTitle,
@@ -45,7 +47,7 @@ async function handleSubmit(request: Request): Promise<Response> {
 	// the client never gets to supply it directly.
 	const { data: guest, error: guestError } = await admin
 		.from("guests")
-		.select("id, max_attendees")
+		.select("id, invite_code, full_name, locale, email, max_attendees")
 		.eq("invite_code", code)
 		.maybeSingle();
 
@@ -85,6 +87,20 @@ async function handleSubmit(request: Request): Promise<Response> {
 
 	if (error || !saved) {
 		throw new ApiError("INTERNAL_ERROR", "Không thể lưu phản hồi");
+	}
+
+	if (attending) {
+		// Awaited (not fire-and-forget) so serverless hosts don't freeze the
+		// function mid-send; it never throws, so the RSVP response is unaffected.
+		await sendRsvpConfirmationIfNeeded(admin, {
+			guestId: guest.id,
+			inviteCode: guest.invite_code,
+			guestName: guest.full_name,
+			guestEmail: guest.email,
+			rsvpEmail: email,
+			locale: locale ?? guest.locale,
+			origin: new URL(request.url).origin,
+		});
 	}
 
 	return apiJsonResponse(mapRsvpRow(saved));
