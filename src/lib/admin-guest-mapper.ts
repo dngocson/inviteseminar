@@ -2,7 +2,7 @@ import { buildInviteUrl } from "#/lib/invite-link";
 import { mapRsvpRow, RSVP_COLUMNS, type RsvpRow } from "#/lib/rsvp-mapper";
 import type { GuestWithRsvpDto, Locale } from "#/lib/schemas";
 
-export const GUEST_WITH_RSVP_SELECT = `id, invite_code, full_name, max_attendees, locale, note, email, invite_sent_at, invite_send_error, created_at, updated_at, rsvp:rsvps(${RSVP_COLUMNS})`;
+export const GUEST_WITH_RSVP_SELECT = `id, invite_code, full_name, max_attendees, locale, note, email, invite_sent_at, invite_send_error, invite_sent_to, invite_sent_kind, created_at, updated_at, rsvp:rsvps(${RSVP_COLUMNS})`;
 
 interface GuestRow {
 	id: string;
@@ -14,6 +14,8 @@ interface GuestRow {
 	email: string | null;
 	invite_sent_at: string | null;
 	invite_send_error: string | null;
+	invite_sent_to: string | null;
+	invite_sent_kind: "invite" | "confirmation" | null;
 	created_at: string;
 	updated_at: string;
 	rsvp: RsvpRow | RsvpRow[] | null;
@@ -32,6 +34,8 @@ export function mapGuestRow(row: GuestRow, origin: string): GuestWithRsvpDto {
 		email: row.email,
 		inviteSentAt: row.invite_sent_at,
 		inviteSendError: row.invite_send_error,
+		inviteSentTo: row.invite_sent_to,
+		inviteSentKind: row.invite_sent_kind,
 		createdAt: row.created_at,
 		updatedAt: row.updated_at,
 		inviteUrl: buildInviteUrl(origin, row.invite_code, row.locale),

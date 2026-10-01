@@ -73,6 +73,8 @@ export const Route = createFileRoute("/api/admin/guests/$id/send-invite")({
 							: {
 									invite_sent_at: new Date().toISOString(),
 									invite_send_error: null,
+									invite_sent_to: guest.email,
+									invite_sent_kind: "invite",
 								},
 					)
 					.eq("id", id)

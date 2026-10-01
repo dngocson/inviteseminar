@@ -150,6 +150,8 @@
   "admin_send_invite_subject_preview": "Tiêu đề:",
   "admin_send_invite_success": "Đã gửi email mời",
   "admin_invite_email_sent": "Đã gửi email · {time}",
+  "admin_confirmation_email_sent": "Đã gửi email xác nhận · {time}",
+  "admin_email_sent_to": "tới {email}",
   "admin_invite_email_failed": "Gửi email thất bại",
   "admin_save": "Lưu",
   "admin_cancel": "Hủy",

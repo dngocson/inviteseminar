@@ -150,6 +150,8 @@
   "admin_send_invite_subject_preview": "Subject:",
   "admin_send_invite_success": "Invitation email sent",
   "admin_invite_email_sent": "Email sent · {time}",
+  "admin_confirmation_email_sent": "Confirmation email sent · {time}",
+  "admin_email_sent_to": "to {email}",
   "admin_invite_email_failed": "Email failed to send",
   "admin_save": "Save",
   "admin_cancel": "Cancel",

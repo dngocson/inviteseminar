@@ -66,6 +66,9 @@ export const guestDto = z.object({
 	email: z.string().nullable(),
 	inviteSentAt: z.iso.datetime().nullable(),
 	inviteSendError: z.string().nullable(),
+	// Address + kind of the last email that went out (see migration 007).
+	inviteSentTo: z.string().nullable(),
+	inviteSentKind: z.enum(["invite", "confirmation"]).nullable(),
 	createdAt: z.iso.datetime(),
 	updatedAt: z.iso.datetime(),
 });

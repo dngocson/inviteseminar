@@ -105,22 +105,45 @@ function ClampedCell({ text }: { text: string | null | undefined }) {
 	);
 }
 
-/** Guest email + whether the invitation email went out. */
+/**
+ * Guest email + the last invitation-related email: an admin-sent invite or
+ * the automatic post-RSVP confirmation (which may go to the RSVP email).
+ */
 function InviteEmailStatus({ guest }: { guest: GuestWithRsvpDto }) {
 	const m = useMessages();
-	if (!guest.email) return null;
+	if (!guest.email && !guest.inviteSentAt && !guest.inviteSendError) {
+		return null;
+	}
+	const time = guest.inviteSentAt
+		? new Date(guest.inviteSentAt).toLocaleString()
+		: "";
+	// Only worth spelling out when it differs from the email shown above.
+	const sentTo =
+		guest.inviteSentTo && guest.inviteSentTo !== guest.email
+			? guest.inviteSentTo
+			: null;
 	return (
 		<span className="mt-0.5 flex flex-col text-xs font-normal">
-			<span className="break-all text-muted-foreground">{guest.email}</span>
+			{guest.email && (
+				<span className="break-all text-muted-foreground">{guest.email}</span>
+			)}
 			{guest.inviteSendError ? (
 				<span className="text-destructive" title={guest.inviteSendError}>
 					{m.admin_invite_email_failed()}
 				</span>
 			) : guest.inviteSentAt ? (
-				<span className="text-emerald-700 dark:text-emerald-400">
-					{m.admin_invite_email_sent({
-						time: new Date(guest.inviteSentAt).toLocaleString(),
-					})}
+				<span
+					className="text-emerald-700 dark:text-emerald-400"
+					title={guest.inviteSentTo ?? undefined}
+				>
+					{guest.inviteSentKind === "confirmation"
+						? m.admin_confirmation_email_sent({ time })
+						: m.admin_invite_email_sent({ time })}
+					{sentTo && (
+						<span className="block break-all text-muted-foreground">
+							{m.admin_email_sent_to({ email: sentTo })}
+						</span>
+					)}
 				</span>
 			) : null}
 		</span>

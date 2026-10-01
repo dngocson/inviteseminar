@@ -36,6 +36,8 @@ export async function sendRsvpConfirmationIfNeeded(
 		.update({
 			invite_sent_at: new Date().toISOString(),
 			invite_send_error: null,
+			invite_sent_to: to,
+			invite_sent_kind: "confirmation",
 		})
 		.eq("id", input.guestId)
 		.is("invite_sent_at", null)
@@ -61,7 +63,9 @@ export async function sendRsvpConfirmationIfNeeded(
 			.from("guests")
 			.update({
 				invite_sent_at: null,
-				invite_send_error: message.slice(0, 500),
+				invite_sent_to: null,
+				invite_sent_kind: null,
+				invite_send_error: `[${to}] ${message}`.slice(0, 500),
 			})
 			.eq("id", input.guestId);
 	}
