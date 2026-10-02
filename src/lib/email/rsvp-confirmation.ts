@@ -8,43 +8,45 @@ export interface RsvpConfirmationInput {
 	guestId: string;
 	inviteCode: string;
 	guestName: string;
-	/** Email the admin entered for the guest, if any. */
-	guestEmail: string | null;
-	/** Email the guest typed into the RSVP form, if any. */
+	/** Email the guest typed into the RSVP form (required when attending). */
 	rsvpEmail: string;
 	locale: Locale;
 	origin: string;
 }
 
 /**
- * After an "attending" RSVP, emails the guest their details + check-in QR —
- * but only if they never received the invitation email (`invite_sent_at` is
- * null). Never throws: the RSVP is already saved, so a failed email is only
- * recorded on the guest row for the admin to see and retry.
+ * After an "attending" RSVP, emails a confirmation (details + check-in QR) to
+ * the address the guest just entered — independent of whether or where the
+ * admin sent the invitation. Sent once per guest (`confirmation_sent_at`).
+ * Never throws: the RSVP is already saved, so a failed email is only recorded
+ * on the guest row and the next attending RSVP tries again.
  */
-export async function sendRsvpConfirmationIfNeeded(
+export async function sendRsvpConfirmationOnce(
 	admin: AdminClient,
 	input: RsvpConfirmationInput,
 ): Promise<void> {
-	const to = input.guestEmail || input.rsvpEmail;
+	const to = input.rsvpEmail.trim();
 	if (!to) return;
 
 	// Claim the send atomically so a double submit can't send twice: only the
-	// request that flips `invite_sent_at` from null gets a row back.
+	// request that flips `confirmation_sent_at` from null gets a row back.
 	const { data: claimed, error: claimError } = await admin
 		.from("guests")
 		.update({
-			invite_sent_at: new Date().toISOString(),
-			invite_send_error: null,
-			invite_sent_to: to,
-			invite_sent_kind: "confirmation",
+			confirmation_sent_at: new Date().toISOString(),
+			confirmation_sent_to: to,
+			confirmation_send_error: null,
 		})
 		.eq("id", input.guestId)
-		.is("invite_sent_at", null)
+		.is("confirmation_sent_at", null)
 		.select("id")
 		.maybeSingle();
 
-	if (claimError || !claimed) return;
+	if (claimError) {
+		console.error("RSVP confirmation claim failed:", claimError.message);
+		return;
+	}
+	if (!claimed) return;
 
 	try {
 		await sendInviteEmail({
@@ -58,14 +60,12 @@ export async function sendRsvpConfirmationIfNeeded(
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
 		console.error("RSVP confirmation email failed:", message);
-		// Release the claim so the admin (or a later RSVP) can send it again.
+		// Release the claim so the next attending RSVP can try again.
 		await admin
 			.from("guests")
 			.update({
-				invite_sent_at: null,
-				invite_sent_to: null,
-				invite_sent_kind: null,
-				invite_send_error: `[${to}] ${message}`.slice(0, 500),
+				confirmation_sent_at: null,
+				confirmation_send_error: message.slice(0, 500),
 			})
 			.eq("id", input.guestId);
 	}

@@ -63,12 +63,15 @@ export const guestDto = z.object({
 	maxAttendees: maxAttendeesSchema,
 	locale: localeSchema,
 	note: z.string().nullable(),
+	// Invitation email: set by the admin, sent from the dashboard.
 	email: z.string().nullable(),
 	inviteSentAt: z.iso.datetime().nullable(),
 	inviteSendError: z.string().nullable(),
-	// Address + kind of the last email that went out (see migration 007).
 	inviteSentTo: z.string().nullable(),
-	inviteSentKind: z.enum(["invite", "confirmation"]).nullable(),
+	// RSVP confirmation email: sent once, automatically, to the RSVP email.
+	confirmationSentAt: z.iso.datetime().nullable(),
+	confirmationSentTo: z.string().nullable(),
+	confirmationSendError: z.string().nullable(),
 	createdAt: z.iso.datetime(),
 	updatedAt: z.iso.datetime(),
 });

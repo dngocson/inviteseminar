@@ -68,11 +68,16 @@ function StatusBadge({ status }: { status: StatusFilter }) {
 	return <Badge variant="secondary">{m.admin_filter_pending()}</Badge>;
 }
 
-/** Company · position, phone, email — whichever the guest filled in. */
-function ContactDetails({ rsvp }: { rsvp: GuestWithRsvpDto["rsvp"] }) {
+/**
+ * What the guest entered on the RSVP form (company · position, phone, email)
+ * plus the status of the automatic confirmation email sent to that email.
+ */
+function ContactDetails({ guest }: { guest: GuestWithRsvpDto }) {
+	const { rsvp } = guest;
 	const role = [rsvp?.jobTitle, rsvp?.company].filter(Boolean).join(" · ");
 	const lines = [role, rsvp?.phone, rsvp?.email].filter(Boolean);
-	if (lines.length === 0) return "—";
+	const hasStatus = guest.confirmationSentAt || guest.confirmationSendError;
+	if (lines.length === 0 && !hasStatus) return "—";
 	return (
 		<div className="flex flex-col gap-0.5">
 			{lines.map((line) => (
@@ -80,6 +85,7 @@ function ContactDetails({ rsvp }: { rsvp: GuestWithRsvpDto["rsvp"] }) {
 					{line}
 				</span>
 			))}
+			<ConfirmationEmailStatus guest={guest} />
 		</div>
 	);
 }
@@ -105,47 +111,74 @@ function ClampedCell({ text }: { text: string | null | undefined }) {
 	);
 }
 
-/**
- * Guest email + the last invitation-related email: an admin-sent invite or
- * the automatic post-RSVP confirmation (which may go to the RSVP email).
- */
-function InviteEmailStatus({ guest }: { guest: GuestWithRsvpDto }) {
+function formatSentAt(iso: string) {
+	return new Date(iso).toLocaleString();
+}
+
+/** Invitation email (admin-entered) + whether the invitation went out. */
+function InviteEmail({ guest }: { guest: GuestWithRsvpDto }) {
 	const m = useMessages();
 	if (!guest.email && !guest.inviteSentAt && !guest.inviteSendError) {
-		return null;
+		return "—";
 	}
-	const time = guest.inviteSentAt
-		? new Date(guest.inviteSentAt).toLocaleString()
-		: "";
-	// Only worth spelling out when it differs from the email shown above.
+	// The invite may have gone to an older address before the email was edited.
 	const sentTo =
 		guest.inviteSentTo && guest.inviteSentTo !== guest.email
 			? guest.inviteSentTo
 			: null;
 	return (
-		<span className="mt-0.5 flex flex-col text-xs font-normal">
-			{guest.email && (
-				<span className="break-all text-muted-foreground">{guest.email}</span>
-			)}
+		<div className="flex flex-col gap-0.5">
+			{guest.email && <span className="break-all">{guest.email}</span>}
 			{guest.inviteSendError ? (
 				<span className="text-destructive" title={guest.inviteSendError}>
 					{m.admin_invite_email_failed()}
 				</span>
 			) : guest.inviteSentAt ? (
-				<span
-					className="text-emerald-700 dark:text-emerald-400"
-					title={guest.inviteSentTo ?? undefined}
-				>
-					{guest.inviteSentKind === "confirmation"
-						? m.admin_confirmation_email_sent({ time })
-						: m.admin_invite_email_sent({ time })}
+				<span className="text-emerald-700 dark:text-emerald-400">
+					{m.admin_invite_email_sent({
+						time: formatSentAt(guest.inviteSentAt),
+					})}
 					{sentTo && (
 						<span className="block break-all text-muted-foreground">
 							{m.admin_email_sent_to({ email: sentTo })}
 						</span>
 					)}
 				</span>
-			) : null}
+			) : (
+				<span className="text-muted-foreground">
+					{m.admin_invite_email_not_sent()}
+				</span>
+			)}
+		</div>
+	);
+}
+
+/** The one-off confirmation email sent after an "attending" RSVP. */
+function ConfirmationEmailStatus({ guest }: { guest: GuestWithRsvpDto }) {
+	const m = useMessages();
+	if (guest.confirmationSendError && !guest.confirmationSentAt) {
+		return (
+			<span className="text-destructive" title={guest.confirmationSendError}>
+				{m.admin_confirmation_email_failed()}
+			</span>
+		);
+	}
+	if (!guest.confirmationSentAt) return null;
+	// The guest may have changed their RSVP email after the confirmation.
+	const sentTo =
+		guest.confirmationSentTo && guest.confirmationSentTo !== guest.rsvp?.email
+			? guest.confirmationSentTo
+			: null;
+	return (
+		<span className="text-emerald-700 dark:text-emerald-400">
+			{m.admin_confirmation_email_sent({
+				time: formatSentAt(guest.confirmationSentAt),
+			})}
+			{sentTo && (
+				<span className="block break-all text-muted-foreground">
+					{m.admin_email_sent_to({ email: sentTo })}
+				</span>
+			)}
 		</span>
 	);
 }
@@ -396,6 +429,7 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 							<TableHeader>
 								<TableRow className="hover:bg-transparent">
 									<TableHead>{m.admin_table_name()}</TableHead>
+									<TableHead>{m.admin_table_invite_email()}</TableHead>
 									<TableHead>{m.admin_table_responder()}</TableHead>
 									<TableHead>{m.admin_table_contact()}</TableHead>
 									<TableHead>{m.admin_table_code()}</TableHead>
@@ -415,13 +449,15 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 									<TableRow key={guest.id}>
 										<TableCell className="min-w-40 max-w-60 font-medium">
 											{guest.fullName}
-											<InviteEmailStatus guest={guest} />
+										</TableCell>
+										<TableCell className="min-w-44 max-w-60 text-xs">
+											<InviteEmail guest={guest} />
 										</TableCell>
 										<TableCell className="min-w-28 max-w-44 text-muted-foreground">
 											{guest.rsvp?.responderName || "—"}
 										</TableCell>
 										<TableCell className="min-w-44 max-w-60 text-xs text-muted-foreground">
-											<ContactDetails rsvp={guest.rsvp} />
+											<ContactDetails guest={guest} />
 										</TableCell>
 										<TableCell className="cell-nowrap font-mono text-xs text-muted-foreground">
 											{guest.inviteCode}
@@ -459,7 +495,6 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 								<div className="flex items-start justify-between gap-2">
 									<div className="min-w-0">
 										<p className="break-words font-medium">{guest.fullName}</p>
-										<InviteEmailStatus guest={guest} />
 										<p className="font-mono text-xs text-muted-foreground">
 											{guest.inviteCode} ({guest.locale.toUpperCase()})
 										</p>
@@ -471,9 +506,16 @@ export function GuestDataView({ guests }: { guests: GuestWithRsvpDto[] }) {
 										{m.admin_table_responder()}: {guest.rsvp.responderName}
 									</p>
 								)}
-								{guest.rsvp && (
+								<div className="mt-2 text-xs">
+									<p className="font-medium text-muted-foreground">
+										{m.admin_table_invite_email()}
+									</p>
+									<InviteEmail guest={guest} />
+								</div>
+								{(guest.rsvp || guest.confirmationSentAt) && (
 									<div className="mt-2 text-xs text-muted-foreground">
-										<ContactDetails rsvp={guest.rsvp} />
+										<p className="font-medium">{m.admin_table_contact()}</p>
+										<ContactDetails guest={guest} />
 									</div>
 								)}
 								{guest.rsvp?.allergies && (
